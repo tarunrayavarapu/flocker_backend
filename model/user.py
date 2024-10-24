@@ -9,9 +9,7 @@ import json
 
 from __init__ import app, db
 from model.github import GitHubUser
-from model.kasm import KasmUser
-from model.stocks import StockUser
-
+from model.section import Section
 
 """ Helper Functions """
 
@@ -45,76 +43,13 @@ class UserSection(db.Model):
     section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), primary_key=True)
     year = db.Column(db.Integer)
 
-    # Define relationships with User and Section models 
     user = db.relationship("User", backref=db.backref("user_sections_rel", cascade="all, delete-orphan"))
-    # Overlaps setting avoids cicular dependencies with Section class.
     section = db.relationship("Section", backref=db.backref("section_users_rel", cascade="all, delete-orphan"), overlaps="users")
-    
+
     def __init__(self, user, section):
         self.user = user
         self.section = section
         self.year = default_year()
-
-
-class Section(db.Model):
-    """
-    Section Model
-    
-    The Section class represents a section within the application, such as a class, department or group.
-    
-    Attributes:
-        id (db.Column): The primary key, an integer representing the unique identifier for the section.
-        _name (db.Column): A string representing the name of the section. It is not unique and cannot be null.
-        _abbreviation (db.Column): A unique string representing the abbreviation of the section's name. It cannot be null.
-    """
-    __tablename__ = 'sections'
-
-    id = db.Column(db.Integer, primary_key=True)
-    _name = db.Column(db.String(255), unique=False, nullable=False)
-    _abbreviation = db.Column(db.String(255), unique=True, nullable=False)
-  
-    # Define many-to-many relationship with User model through UserSection table
-    # Overlaps setting avoids cicular dependencies with UserSection class
-    users = db.relationship('User', secondary=UserSection.__table__, lazy='subquery',
-                            backref=db.backref('section_users_rel', lazy=True, viewonly=True), overlaps="section_users_rel,user_sections_rel,user")    
-    
-    # Constructor
-    def __init__(self, name, abbreviation):
-        self._name = name 
-        self._abbreviation = abbreviation
-        
-    @property
-    def abbreviation(self):
-        return self._abbreviation
-
-    # String representation of the Classes object
-    def __repr__(self):
-        return f"Class(_id={self.id}, name={self._name}, abbreviation={self._abbreviation})"
-
-    # CRUD create
-    def create(self):
-        try:
-            db.session.add(self)
-            db.session.commit()
-            return self
-        except IntegrityError:
-            db.session.rollback()
-            return None
-
-    # CRUD read
-    def read(self):
-        return {
-            "id": self.id,
-            "name": self._name,
-            "abbreviation": self._abbreviation
-        }
-        
-    # CRUD delete: remove self
-    # None
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return None
 
 
 class User(db.Model, UserMixin):
@@ -134,7 +69,6 @@ class User(db.Model, UserMixin):
         _password (Column): A string representing the hashed password of the user. It is not unique and cannot be null.
         _role (Column): A string representing the user's role within the application. Defaults to "User".
         _pfp (Column): A string representing the path to the user's profile picture. It can be null.
-        kasm_server_needed (Column): A boolean indicating whether the user requires a Kasm server.
         sections (Relationship): A many-to-many relationship between users and sections, allowing users to be associated with multiple sections.
     """
     __tablename__ = 'users'
@@ -146,22 +80,17 @@ class User(db.Model, UserMixin):
     _password = db.Column(db.String(255), unique=False, nullable=False)
     _role = db.Column(db.String(20), default="User", nullable=False)
     _pfp = db.Column(db.String(255), unique=False, nullable=True)
-    kasm_server_needed = db.Column(db.Boolean, default=False)
    
     # Define many-to-many relationship with Section model through UserSection table 
     # Overlaps setting avoids cicular dependencies with UserSection class
-    sections = db.relationship('Section', secondary=UserSection.__table__, lazy='subquery',
-                               backref=db.backref('user_sections_rel', lazy=True, viewonly=True), overlaps="user_sections_rel,section,section_users_rel,user,users")
+    posts = db.relationship('Post', backref='author', lazy=True)
+    moderated_groups = db.relationship('Group', backref='moderator', lazy=True)                              
     
-    # Define one-to-one relationship with StockUser model
-    stock_user = db.relationship("StockUser", backref=db.backref("users", cascade="all"), lazy=True, uselist=False)
-
-    def __init__(self, name, uid, password=app.config["DEFAULT_PASSWORD"], kasm_server_needed=False, role="User", pfp=''):
+    def __init__(self, name, uid, password=app.config["DEFAULT_PASSWORD"], role="User", pfp=''):
         self._name = name
         self._uid = uid
         self._email = "?"
         self.set_password(password)
-        self.kasm_server_needed = kasm_server_needed
         self._role = role
         self._pfp = pfp
 
@@ -294,7 +223,6 @@ class User(db.Model, UserMixin):
             "email": self.email,
             "role": self._role,
             "pfp": self._pfp,
-            "kasm_server_needed": self.kasm_server_needed,
         }
         sections = self.read_sections()
         data.update(sections)
@@ -310,11 +238,6 @@ class User(db.Model, UserMixin):
         uid = inputs.get("uid", "")
         password = inputs.get("password", "")
         pfp = inputs.get("pfp", None)
-        kasm_server_needed = inputs.get("kasm_server_needed", None)
-
-        # States before update
-        old_uid = self.uid
-        old_kasm_server_needed = self.kasm_server_needed
 
         # Update table with new data
         if name:
@@ -325,28 +248,9 @@ class User(db.Model, UserMixin):
             self.set_password(password)
         if pfp is not None:
             self.pfp = pfp
-        if kasm_server_needed is not None:
-            self.kasm_server_needed = bool(kasm_server_needed)
 
         # Check this on each update
         self.set_email()
-
-        # Make a KasmUser object to interact with the Kasm API
-        kasm_user = KasmUser()
-
-        # Update Kasm server group membership if needed
-        if self.kasm_server_needed:
-            # UID has changed, delete old Kasm user if it exists
-            if old_uid != self.uid:
-                kasm_user.delete(old_uid)
-            # Create or update the user in Kasm, including a password
-            kasm_user.post(self.name, self.uid, password if password else app.config["DEFAULT_PASSWORD"])
-            # User is transtioning from non-Kasm to Kasm user, thus it requires posting all groups to Kasm
-            if not old_kasm_server_needed:
-                kasm_user.post_groups(self.uid, [section.abbreviation for section in self.sections])
-        # User is transitioning from Kasm user to non-Kasm user, thus it requires cleanup of defunct Kasm user
-        elif old_kasm_server_needed:
-            kasm_user.delete(self.uid)
 
         try:
             db.session.commit()
@@ -359,7 +263,6 @@ class User(db.Model, UserMixin):
     # None
     def delete(self):
         try:
-            KasmUser().delete(self.uid)
             db.session.delete(self)
             db.session.commit()
         except IntegrityError:
@@ -399,9 +302,6 @@ class User(db.Model, UserMixin):
         else:
             # Handle the case where the section exists
             print("Section with abbreviation '{}' exists.".format(section._abbreviation))
-        # update kasm group membership
-        if self.kasm_server_needed:
-            KasmUser().post_groups(self.uid, [section.abbreviation])
         return self
     
     def add_sections(self, sections):
@@ -513,23 +413,6 @@ class User(db.Model, UserMixin):
             if os.path.exists(old_path):
                 os.rename(old_path, new_path)
 
-    def add_stockuser(self):
-        """
-        Add 1-to-1 stock user to the user's record. 
-        """
-        if not self.stock_user:
-            self.stock_user = StockUser(uid=self._uid, stockmoney=100000)
-            db.session.commit()
-        return self 
-            
-    def read_stockuser(self):
-        """
-        Read the stock user daata associated with the user.
-        """
-        if self.stock_user:
-            return self.stock_user.read()
-        return None
-    
 """Database Creation and Testing """
 
 # Builds working data set for testing
@@ -539,9 +422,9 @@ def initUsers():
         db.create_all()
         """Tester data for table"""
         
-        u1 = User(name='Thomas Edison', uid=app.config['ADMIN_USER'], password=app.config['ADMIN_PASSWORD'], pfp='toby.png', kasm_server_needed=True, role="Admin")
-        u2 = User(name='Grace Hopper', uid=app.config['DEFAULT_USER'], password=app.config['DEFAULT_PASSWORD'], pfp='hop.png', kasm_server_needed=False)
-        u3 = User(name='Nicholas Tesla', uid='niko', password='123niko', pfp='niko.png', kasm_server_needed=False)
+        u1 = User(name='Thomas Edison', uid=app.config['ADMIN_USER'], password=app.config['ADMIN_PASSWORD'], pfp='toby.png', role="Admin")
+        u2 = User(name='Grace Hopper', uid=app.config['DEFAULT_USER'], password=app.config['DEFAULT_PASSWORD'], pfp='hop.png')
+        u3 = User(name='Nicholas Tesla', uid='niko', password='123niko', pfp='niko.png' )
         users = [u1, u2, u3]
         
         for user in users:
