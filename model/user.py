@@ -8,8 +8,6 @@ import os
 import json
 
 from __init__ import app, db
-from model.github import GitHubUser
-from model.section import Section
 
 """ Helper Functions """
 
@@ -25,32 +23,6 @@ def default_year():
 """ Database Models """
 
 ''' Tutorial: https://www.sqlalchemy.org/library.html#tutorials, try to get into Python shell and follow along '''
-
-class UserSection(db.Model):
-    """ 
-    UserSection Model
-
-    A many-to-many relationship between the 'users' and 'sections' tables.
-
-    Attributes:
-        user_id (Column): An integer representing the user's unique identifier, a foreign key that references the 'users' table.
-        section_id (Column): An integer representing the section's unique identifier, a foreign key that references the 'sections' table.
-        year (Column): An integer representing the year the user enrolled with the section. Defaults to the current year.
-    """
-    __tablename__ = 'user_sections'
-    
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
-    section_id = db.Column(db.Integer, db.ForeignKey('sections.id'), primary_key=True)
-    year = db.Column(db.Integer)
-
-    user = db.relationship("User", backref=db.backref("user_sections_rel", cascade="all, delete-orphan"))
-    section = db.relationship("Section", backref=db.backref("section_users_rel", cascade="all, delete-orphan"), overlaps="users")
-
-    def __init__(self, user, section):
-        self.user = user
-        self.section = section
-        self.year = default_year()
-
 
 class User(db.Model, UserMixin):
     """
@@ -69,7 +41,6 @@ class User(db.Model, UserMixin):
         _password (Column): A string representing the hashed password of the user. It is not unique and cannot be null.
         _role (Column): A string representing the user's role within the application. Defaults to "User".
         _pfp (Column): A string representing the path to the user's profile picture. It can be null.
-        sections (Relationship): A many-to-many relationship between users and sections, allowing users to be associated with multiple sections.
     """
     __tablename__ = 'users'
 
@@ -224,8 +195,6 @@ class User(db.Model, UserMixin):
             "role": self._role,
             "pfp": self._pfp,
         }
-        sections = self.read_sections()
-        data.update(sections)
         return data
         
     # CRUD update: updates user name, password, phone
@@ -287,110 +256,6 @@ class User(db.Model, UserMixin):
         self.pfp = None
         db.session.commit()
         
-    def add_section(self, section):
-        # Query for the section using the provided abbreviation
-        found = any(s.id == section.id for s in self.sections)
-        
-        # Check if the section was found
-        if not found:
-            # Add the section to the user's sections
-            user_section = UserSection(user=self, section=section)
-            db.session.add(user_section)
-            
-            # Commit the changes to the database
-            db.session.commit()
-        else:
-            # Handle the case where the section exists
-            print("Section with abbreviation '{}' exists.".format(section._abbreviation))
-        return self
-    
-    def add_sections(self, sections):
-        """
-        Add multiple sections to the user's profile.
-
-        :param sections: A list of section abbreviations to be added.
-        :return: The user object with the added sections, or None if any section is not found.
-        """
-        # Iterate over each section abbreviation provided
-        for section in sections:
-            # Query the Section model to find the section object by its abbreviation
-            section_obj = Section.query.filter_by(_abbreviation=section).first()
-            # If the section is not found, return None
-            if not section_obj:
-                return None
-            # Add the found section object to the user's profile
-            self.add_section(section_obj)
-        # Return the user object with the added sections
-        return self
-        
-    def read_sections(self):
-        """Reads the sections associated with the user."""
-        sections = []
-        # The user_sections_rel backref provides access to the many-to-many relationship data 
-        if self.user_sections_rel:
-            for user_section in self.user_sections_rel:
-                # This user_section backref "row" can be used to access section methods 
-                section_data = user_section.section.read()
-                # Extract the year from the relationship data  
-                section_data['year'] = user_section.year  
-                sections.append(section_data)
-        return {"sections": sections} 
-    
-    def update_section(self, section_data):
-        """
-        Updates the year enrolled for a given section.
-
-        :param section_data: A dictionary containing the section's abbreviation and the new year.
-        :return: A boolean indicating if the update was successful.
-        """
-        abbreviation = section_data.get("abbreviation", None)
-        year = int(section_data.get("year", default_year()))  # Convert year to integer, default to 0 if not found
-
-        # Find the user_section that matches the provided abbreviation through the user_sections_rel backref
-        section = next(
-            (s for s in self.user_sections_rel if s.section.abbreviation == abbreviation),
-            None
-        )
-
-        if section:
-            # Update the year for the found section
-            section.year = year
-            db.session.commit()
-            return True  # Update successful
-        else:
-            return False  # Section not found
-    
-    def remove_sections(self, section_abbreviations):
-        """
-        Remove sections based on provided abbreviations.
-
-        :param section_abbreviations: A list of section abbreviations to be removed.
-        :return: True if all sections are removed successfully, False otherwise.
-        """
-        try:
-            # Iterate over each abbreviation in the provided list
-            for abbreviation in section_abbreviations:
-                # Find the section matching the current abbreviation
-                section = next((section for section in self.sections if section.abbreviation == abbreviation), None)
-                if section:
-                    # If the section is found, remove it from the list of sections
-                    self.sections.remove(section)
-                else:
-                    # If the section is not found, raise a ValueError
-                    raise ValueError(f"Section with abbreviation '{abbreviation}' not found.")
-            db.session.commit()
-            return True
-        except ValueError as e:
-            # Roll back the transaction if a ValueError is encountered
-            db.session.rollback()
-            print(e)  # Log the specific abbreviation error
-            return False
-        except Exception as e:
-            # Roll back the transaction if any other exception is encountered
-            db.session.rollback()
-            print(f"Unexpected error removing sections: {e}") # Log the unexpected error
-            return False
-        
     def set_uid(self, new_uid=None):
         """
         Update the user's directory based on the new UID provided.
@@ -434,24 +299,3 @@ def initUsers():
                 '''fails with bad or duplicate data'''
                 db.session.remove()
                 print(f"Records exist, duplicate email, or error: {user.uid}")
-
-        s1 = Section(name='Computer Science A', abbreviation='CSA')
-        s2 = Section(name='Computer Science Principles', abbreviation='CSP')
-        s3 = Section(name='Engineering Robotics', abbreviation='Robotics')
-        s4 = Section(name='Computer Science and Software Engineering', abbreviation='CSSE')
-        sections = [s1, s2, s3, s4]
-        
-        for section in sections:
-            try:
-                section.create()    
-            except IntegrityError:
-                '''fails with bad or duplicate data'''
-                db.session.remove()
-                print(f"Records exist, duplicate email, or error: {section.name}")
-            
-        u1.add_section(s1)
-        u1.add_section(s2)
-        u2.add_section(s2)
-        u2.add_section(s3)
-        u3.add_section(s4)
-        

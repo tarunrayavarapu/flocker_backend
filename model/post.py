@@ -1,6 +1,6 @@
 # post.py
-from __init__ import db
 from sqlalchemy import Text
+from __init__ import db
 
 class Post(db.Model):
     """
