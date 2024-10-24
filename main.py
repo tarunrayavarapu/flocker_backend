@@ -15,6 +15,9 @@ from api.user import user_api
 from api.pfp import pfp_api
 # database Initialization functions
 from model.user import User, initUsers
+from model.group import initGroups
+from model.post import initPosts
+from model.section import initSections
 # server only Views
 
 # register URIs for api endpoints
@@ -121,6 +124,9 @@ custom_cli = AppGroup('custom', help='Custom commands')
 @custom_cli.command('generate_data')
 def generate_data():
     initUsers()
+    initGroups()
+    initPosts()
+    initSections()
 
 # Register the custom command group with the Flask application
 app.cli.add_command(custom_cli)

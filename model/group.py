@@ -1,5 +1,5 @@
 # group.py
-from __init__ import db
+from __init__ import app, db
 
 class Group(db.Model):
     """
@@ -37,3 +37,9 @@ class Group(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+        
+def initGroups():
+    with app.app_context():
+        """Create database and tables"""
+        db.create_all()
+        """Tester data for table"""

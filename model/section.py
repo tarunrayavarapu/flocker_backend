@@ -1,5 +1,5 @@
 # section.py
-from __init__ import db
+from __init__ import app, db
 
 class Section(db.Model):
     """
@@ -34,3 +34,9 @@ class Section(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+
+def initSections():
+    with app.app_context():
+        """Create database and tables"""
+        db.create_all()
+        """Tester data for table"""

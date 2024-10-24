@@ -1,6 +1,6 @@
 # post.py
 from sqlalchemy import Text
-from __init__ import db
+from __init__ import app, db
 
 class Post(db.Model):
     """
@@ -23,9 +23,6 @@ class Post(db.Model):
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     _group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
 
-    user = db.relationship('User', backref=db.backref('posts', lazy=True))
-    group = db.relationship('Group', backref=db.backref('posts', lazy=True))
-
     def __init__(self, title, content, user_id, group_id):
         self._title = title
         self._content = content
@@ -42,3 +39,9 @@ class Post(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
+        
+def initPosts():
+    with app.app_context():
+        """Create database and tables"""
+        db.create_all()
+        """Tester data for table"""
