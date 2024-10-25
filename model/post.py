@@ -41,6 +41,33 @@ class Post(db.Model):
             db.session.rollback()
             raise e
         
+    # CRUD read converts self to dictionary
+    # returns dictionary
+    def read(self):
+        data = {
+            "id": self.id,
+            "title": self._title,
+            "content": self._content,
+            "user_id": self._user_id,
+            "group_id": self._group_id
+        }
+        return data
+    
+    def update(self):
+        try:
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+        
+    def delete(self):
+        try:
+            db.session.delete(self)
+            db.session.commit()
+        except Exception as e:
+            db.session.rollback()
+            raise e
+        
 def initPosts():
     with app.app_context():
         """Create database and tables"""
