@@ -2,6 +2,8 @@
 from sqlite3 import IntegrityError
 from sqlalchemy import Text
 from __init__ import app, db
+from model.user import User
+from model.group import Group
 
 class Post(db.Model):
     """
@@ -44,12 +46,14 @@ class Post(db.Model):
     # CRUD read converts self to dictionary
     # returns dictionary
     def read(self):
+        user = User.query.get(self._user_id)
+        group = Group.query.get(self._group_id)
         data = {
             "id": self.id,
             "title": self._title,
             "content": self._content,
-            "user_id": self._user_id,
-            "group_id": self._group_id
+            "user_name": user.name if user else None,
+            "group_name": group.name if group else None
         }
         return data
     
@@ -86,4 +90,3 @@ def initPosts():
                 '''fails with bad or duplicate data'''
                 db.session.remove()
                 print(f"Records exist, duplicate email, or error: {post.uid}")
-        

@@ -27,6 +27,10 @@ class Group(db.Model):
         self._name = name
         self._section_id = section_id
         self._moderator_id = moderator_id
+        
+    @property
+    def name(self):
+        return self._name
 
     def __repr__(self):
         return f"Group(id={self.id}, name={self._name}, section_id={self._section_id}, moderator_id={self._moderator_id})"
