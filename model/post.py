@@ -1,4 +1,5 @@
 # post.py
+from sqlite3 import IntegrityError
 from sqlalchemy import Text
 from __init__ import app, db
 
@@ -45,3 +46,17 @@ def initPosts():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
+        
+        p1 = Post(title='Calculus Help', content='Need help with derivatives.', user_id=1, group_id=1)  
+        p2 = Post(title='Game Day', content='Who is coming to the game?', user_id=2, group_id=2)
+        p3 = Post(title='New Releases', content='What movies are you excited for?', user_id=3, group_id=3)
+        p4 = Post(title='Study Group', content='Meeting at the library.', user_id=1, group_id=1)
+        
+        for post in [p1, p2, p3, p4]:
+            try:
+                post.create()
+            except IntegrityError:
+                '''fails with bad or duplicate data'''
+                db.session.remove()
+                print(f"Records exist, duplicate email, or error: {post.uid}")
+        
