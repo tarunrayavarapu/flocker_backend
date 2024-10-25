@@ -1,76 +1,93 @@
 import jwt
 from flask import Blueprint, request, jsonify, current_app, Response, g
-from flask_restful import Api, Resource # used for REST API building
+from flask_restful import Api, Resource  # used for REST API building
 from datetime import datetime
 from __init__ import app
 from api.jwt_authorize import token_required
 from model.post import Post
 
-post_api = Blueprint('post_api', __name__,
-                   url_prefix='/api')
+"""
+This Blueprint object is used to define APIs for the Post model.
+- Blueprint is used to modularize application files.
+- This Blueprint is registered to the Flask app in main.py.
+"""
+post_api = Blueprint('post_api', __name__, url_prefix='/api')
 
-# API docs https://flask-restful.readthedocs.io/en/latest/api.html
+"""
+The Api object is connected to the Blueprint object to define the API endpoints.
+- The API object is used to add resources to the API.
+- The objects added are mapped to code that contains the actions for the API.
+- For more information, refer to the API docs: https://flask-restful.readthedocs.io/en/latest/api.html
+"""
 api = Api(post_api)
 
-class PostAPI: 
-    
+class PostAPI:
+    """
+    Define the API CRUD endpoints for the Post model.
+    There are four operations that correspond to common HTTP methods:
+    - post: create a new post
+    - get: read posts
+    - put: update a post
+    - delete: delete a post
+    """
     class _CRUD(Resource):
         @token_required()
         def post(self):
-            # obtain the current user from the global context
+            # Obtain the current user from the token required setting in the global context
             current_user = g.current_user
-            # obtain the request data
+            # Obtain the request data sent by the RESTful client API
             data = request.get_json()
-            # create a new post
+            # Create a new post object using the data from the request
             post = Post(data['title'], data['content'], current_user.id, data['group_id'])
-            # save the post
+            # Save the post object using the Object Relational Mapper (ORM) method defined in the model
             post.create()
-            # return response
+            # Return response to the client in JSON format, converting Python dictionaries to JSON format
             return jsonify(post.read())
 
         @token_required()
         def get(self):
-            # obtain the current user from the global context
+            # Obtain the current user
             current_user = g.current_user
-            # find all posts by the current user
-            posts = Post.query.filter(Post._user_id == current_user.id).all()            
-            # prepare a json list of user dictionaries
-            json_ready = []
-            for post in posts:
-                post_data = post.read()
-                json_ready.append(post_data)
-            
-            # return response, a json list of user dictionaries
+            # Find all the posts by the current user
+            posts = Post.query.filter(Post._user_id == current_user.id).all()
+            # Prepare a JSON list of all the posts, uses for loop shortcut called list comprehension
+            json_ready = [post.read() for post in posts]
+            # Return a JSON list, converting Python dictionaries to JSON format
             return jsonify(json_ready)
-        
+
         @token_required()
         def put(self):
-            # obtain the current user from the global context
+            # Obtain the current user
             current_user = g.current_user
-            # obtain the request data
+            # Obtain the request data
             data = request.get_json()
-            # find the post to update
+            # Find the current post from the database table(s)
             post = Post.query.get(data['id'])
-            # update the post
+            # Update the post
             post._title = data['title']
             post._content = data['content']
             post._group_id = data['group_id']
-            # save the post
+            # Save the post
             post.update()
-            # return response
+            # Return response
             return jsonify(post.read())
-        
+
         @token_required()
         def delete(self):
-            # obtain the current user from the global context
+            # Obtain the current user
             current_user = g.current_user
-            # obtain the request data
+            # Obtain the request data
             data = request.get_json()
-            # find the post to delete
+            # Find the current post from the database table(s)
             post = Post.query.get(data['id'])
-            # delete the post
+            # Delete the post using the ORM method defined in the model
             post.delete()
-            # return response
+            # Return response
             return jsonify({"message": "Post deleted"})
-            
+
+    """
+    Map the _CRUD class to the API endpoints for /post.
+    - The API resource class inherits from flask_restful.Resource.
+    - The _CRUD class defines the HTTP methods for the API.
+    """
     api.add_resource(_CRUD, '/post')
