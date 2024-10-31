@@ -7,7 +7,7 @@ from model.group import Group
 
 class NestPost(db.Model):
     """
-    Post Model
+    NestPost Model
     
     The Post class represents an individual contribution or discussion within a group.
     
@@ -17,15 +17,16 @@ class NestPost(db.Model):
         _content (db.Column): A Text blob representing the content of the post.
         _user_id (db.Column): An integer representing the user who created the post.
         _group_id (db.Column): An integer representing the group to which the post belongs.
+        _image_url (db.Column): A string representing the url path to the image contained in the post
     """
-    __tablename__ = 'posts'
+    __tablename__ = 'nestPosts'
 
     id = db.Column(db.Integer, primary_key=True)
     _title = db.Column(db.String(255), nullable=False)
     _content = db.Column(Text, nullable=False)
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     _group_id = db.Column(db.Integer, db.ForeignKey('groups.id'), nullable=False)
-    _image_url = db.Column(db.Integer, db.ForeignKey('image.id'), nullable=False)
+    _image_url = db.Column(db.String(255), nullable=False)
 
     def __init__(self, title, content, user_id, group_id, image_url):
         """
@@ -36,6 +37,7 @@ class NestPost(db.Model):
             content (str): The content of the post.
             user_id (int): The user who created the post.
             group_id (int): The group to which the post belongs.
+            image_url (str): The url path to the image
         """
         self._title = title
         self._content = content
@@ -88,6 +90,7 @@ class NestPost(db.Model):
             "content": self._content,
             "user_name": user.name if user else None,
             "group_name": group.name if group else None,
+            # Review information as this may not work as this is a quick workaround
             "image_url": group.image_url if group else None
         }
         return data
