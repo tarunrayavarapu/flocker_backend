@@ -128,7 +128,7 @@ class NestPost(db.Model):
             db.session.rollback()
             raise e
 
-def initPosts():
+def initNestPosts():
     """
     The initPosts function creates the Post table and adds tester data to the table.
     
