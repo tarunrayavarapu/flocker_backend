@@ -16,11 +16,13 @@ from api.pfp import pfp_api
 from api.post import post_api
 from api.group import group_api
 from api.section import section_api
+from api.nestPost import nestPost_api
 # database Initialization functions
 from model.user import User, initUsers
 from model.group import initGroups
 from model.post import initPosts
 from model.section import initSections
+from model.nestPost import initNestPosts
 # server only Views
 
 # register URIs for api endpoints
@@ -29,6 +31,7 @@ app.register_blueprint(pfp_api)
 app.register_blueprint(post_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
+app.register_blueprint(nestPost_api)
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
@@ -133,6 +136,7 @@ def generate_data():
     initGroups()
     initPosts()
     initSections()
+    initNestPosts()
 
 # Register the custom command group with the Flask application
 app.cli.add_command(custom_cli)
