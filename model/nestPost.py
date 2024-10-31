@@ -43,7 +43,7 @@ class NestPost(db.Model):
         self._content = content
         self._user_id = user_id
         self._group_id = group_id
-        self.image_url = image_url
+        self._image_url = image_url
 
     def __repr__(self):
         """
@@ -91,7 +91,7 @@ class NestPost(db.Model):
             "user_name": user.name if user else None,
             "group_name": group.name if group else None,
             # Review information as this may not work as this is a quick workaround
-            "image_url": self.image_url
+            "image_url": self._image_url
         }
         return data
     
