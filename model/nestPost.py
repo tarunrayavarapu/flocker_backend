@@ -91,7 +91,7 @@ class NestPost(db.Model):
             "user_name": user.name if user else None,
             "group_name": group.name if group else None,
             # Review information as this may not work as this is a quick workaround
-            "image_url": group.image_url if group else None
+            "image_url": self.image_url
         }
         return data
     
@@ -146,10 +146,10 @@ def initNestPosts():
         db.create_all()
         """Tester data for table"""
         
-        p1 = NestPost(title='Calculus Help', content='Need help with derivatives.', user_id=1, group_id=1, image_url="img/pizza")  
-        p2 = NestPost(title='Game Day', content='Who is coming to the game?', user_id=2, group_id=2, image_url="img/pizza")
-        p3 = NestPost(title='New Releases', content='What movies are you excited for?', user_id=3, group_id=3, image_url="img/pizza")
-        p4 = NestPost(title='Study Group', content='Meeting at the library.', user_id=1, group_id=1, image_url="img/pizza")
+        p1 = NestPost(title='Calculus Help', content='Need help with derivatives.', user_id=1, group_id=1, image_url="img/pizza.png")  
+        p2 = NestPost(title='Game Day', content='Who is coming to the game?', user_id=2, group_id=2, image_url="img/pizza.png")
+        p3 = NestPost(title='New Releases', content='What movies are you excited for?', user_id=3, group_id=3, image_url="img/pizza.png")
+        p4 = NestPost(title='Study Group', content='Meeting at the library.', user_id=1, group_id=1, image_url="img/pizza.png")
         
         for post in [p1, p2, p3, p4]:
             try:
