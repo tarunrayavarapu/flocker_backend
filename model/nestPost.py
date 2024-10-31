@@ -53,7 +53,7 @@ class NestPost(db.Model):
         Returns:
             str: A text representation of how to create the object.
         """
-        return f"Post(id={self.id}, title={self._title}, content={self._content}, user_id={self._user_id}, group_id={self._group_id}, image_url={self.image_url})"
+        return f"Post(id={self.id}, title={self._title}, content={self._content}, user_id={self._user_id}, group_id={self._group_id}, image_url={self._image_url})"
 
     def create(self):
         """
