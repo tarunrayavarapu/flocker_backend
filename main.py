@@ -13,16 +13,17 @@ from __init__ import app, db, login_manager  # Key Flask objects
 # API endpoints
 from api.user import user_api 
 from api.pfp import pfp_api
+from api.nestImg import nestImg_api # Justin added this, custom format for his website
 from api.post import post_api
 from api.group import group_api
 from api.section import section_api
-from api.nestPost import nestPost_api
+from api.nestPost import nestPost_api # Justin added this, custom format for his website
 # database Initialization functions
 from model.user import User, initUsers
 from model.group import initGroups
 from model.post import initPosts
 from model.section import initSections
-from model.nestPost import initNestPosts
+from model.nestPost import initNestPosts # Justin added this, custom format for his website
 # server only Views
 
 # register URIs for api endpoints
@@ -31,7 +32,9 @@ app.register_blueprint(pfp_api)
 app.register_blueprint(post_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
+# Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
 app.register_blueprint(nestPost_api)
+app.register_blueprint(nestImg_api)
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
