@@ -28,7 +28,6 @@ class _NestImage(Resource):
     - HTTP status code 500 if an error occurs while reading the profile picture from the server.
     """
     @token_required()
-    # STILL BROKEN, GO BACK AND FIX
     def get(self):
         current_user = g.current_user
         data = request.get_json()
@@ -64,7 +63,7 @@ class _NestImage(Resource):
         current_user = g.current_user
         # Grabs information and plugs it into NestPost table to get image information
         data = request.get_json()
-        current_nestPost = NestPost.query.filter_by(id=data["imageID"]).first
+        current_nestPost = NestPost.query.filter_by(id=data["imageID"]).first()
         
         # Obtain the base64 image data from the request
         if 'nestImg' not in request.json:
