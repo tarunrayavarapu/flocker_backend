@@ -1,7 +1,7 @@
 from flask import Blueprint, g, request
 from flask_restful import Api, Resource
 from api.jwt_authorize import token_required
-from model.post import Post
+from model.nestPost import NestPost
 from model.nestImg import nestImg_base64_decode, nestImg_base64_upload
 
 nestImg_api = Blueprint('nestImg_api', __name__, url_prefix='/api/id')
@@ -31,9 +31,11 @@ class _NestImage(Resource):
     # STILL BROKEN, GO BACK AND FIX
     def get(self):
         current_user = g.current_user
+        data = request.get_json()
+        current_nestPost = NestPost.query.filter_by(id=data["imageID"]).first()
 
-        if current_user.pfp:
-            base64_encode = nestImg_base64_decode(current_user.uid, current_user.pfp)
+        if current_nestPost._image_url:
+            base64_encode = nestImg_base64_decode(current_user.uid, current_nestPost._image_url)
             if not base64_encode:
                 return {'message': 'An error occurred while reading the picture.'}, 500
             return {'postImg': base64_encode}, 200
@@ -60,7 +62,10 @@ class _NestImage(Resource):
         - HTTP status code 500 if an error occurs during the upload process or while updating the database.
         """
         current_user = g.current_user
-
+        # Grabs information and plugs it into NestPost table to get image information
+        data = request.get_json()
+        current_nestPost = NestPost.query.filter_by(id=data["imageID"]).first
+        
         # Obtain the base64 image data from the request
         if 'nestImg' not in request.json:
             return {'message': 'Base64 image data required.'}, 400
@@ -74,7 +79,7 @@ class _NestImage(Resource):
         # Update the user's profile picture to the uploaded file
         try:
             # write the filename reference to the database
-            current_user.update({"nestImg": filename})
+            current_nestPost.update({"nestImg": filename})
             return {'message': 'Post picture updated successfully'}, 200
         except Exception as e:
             return {'message': f'A database error occurred while assigning post picture: {str(e)}'}, 500
