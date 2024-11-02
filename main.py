@@ -14,6 +14,7 @@ from __init__ import app, db, login_manager  # Key Flask objects
 from api.user import user_api 
 from api.pfp import pfp_api
 from api.post import post_api
+from api.channel import channel_api
 from api.group import group_api
 from api.section import section_api
 # database Initialization functions
@@ -28,6 +29,7 @@ from model.post import initPosts
 app.register_blueprint(user_api)
 app.register_blueprint(pfp_api) 
 app.register_blueprint(post_api)
+app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
 

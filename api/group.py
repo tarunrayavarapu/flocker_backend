@@ -72,8 +72,6 @@ class GroupAPI:
             """
             Update a group.
             """
-            # Obtain the current user from the token required setting in the global context
-            current_user = g.current_user
             # Obtain the request data sent by the RESTful client API
             data = request.get_json()
             # Find the group to update
