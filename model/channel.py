@@ -46,6 +46,16 @@ class Channel(db.Model):
             str: A text representation of how to create the object.
         """
         return f"Channel(id={self.id}, name={self._name}, group_id={self._group_id}, attributes={self._attributes})"
+    
+    @property
+    def name(self):
+        """
+        Gets the channel's name.
+        
+        Returns:
+            str: The channel's name.
+        """
+        return self._name
 
     def create(self):
         """

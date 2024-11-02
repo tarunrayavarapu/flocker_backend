@@ -145,13 +145,13 @@ def initPosts():
         p3 = Post(title='Game vs Westview', content={'comment': 'Ready to win!'}, user_id=2, channel_id=3)
         p4 = Post(title='Math Homework', content={'comment': 'Need help with derivatives.'}, user_id=3, channel_id=4)
         p5 = Post(title='English Essay', content={'comment': 'Struggling with my essay.'}, user_id=3, channel_id=5)
-        p6 = Post(title='Favorite Artist', content={'comment': 'I love this artist!'}, user_id=4, channel_id=6)
-        p7 = Post(title='Music Genre', content={'comment': 'What genre do you like?'}, user_id=4, channel_id=7)
-        p8 = Post(title='Humor', content={'comment': 'Share your funniest jokes!'}, user_id=5, channel_id=8)
-        p9 = Post(title='Memes', content={'comment': 'Post your favorite memes!'}, user_id=5, channel_id=9)
-        p10 = Post(title='Irony', content={'comment': 'Discuss ironic situations.'}, user_id=5, channel_id=10)
-        p11 = Post(title='Cyber Patriots', content={'comment': 'Join the team!'}, user_id=6, channel_id=11)
-        p12 = Post(title='Robotics', content={'comment': 'Building a new robot.'}, user_id=6, channel_id=12)
+        p6 = Post(title='Favorite Artist', content={'comment': 'I love this artist!'}, user_id=1, channel_id=6)
+        p7 = Post(title='Music Genre', content={'comment': 'What genre do you like?'}, user_id=1, channel_id=7)
+        p8 = Post(title='Humor', content={'comment': 'Share your funniest jokes!'}, user_id=2, channel_id=8)
+        p9 = Post(title='Memes', content={'comment': 'Post your favorite memes!'}, user_id=2, channel_id=9)
+        p10 = Post(title='Irony', content={'comment': 'Discuss ironic situations.'}, user_id=3, channel_id=10)
+        p11 = Post(title='Cyber Patriots', content={'comment': 'Join the team!'}, user_id=3, channel_id=11)
+        p12 = Post(title='Robotics', content={'comment': 'Building a new robot.'}, user_id=1, channel_id=12)
         
         posts = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12]
         for post in posts:
