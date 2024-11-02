@@ -14,6 +14,7 @@ class Post(db.Model):
     Attributes:
         id (db.Column): The primary key, an integer representing the unique identifier for the post.
         _title (db.Column): A string representing the title of the post.
+        _comment (db.Column): A string representing the comment of the post.
         _content (db.Column): A JSON blob representing the content of the post.
         _user_id (db.Column): An integer representing the user who created the post.
         _channel_id (db.Column): An integer representing the channel to which the post belongs.
@@ -22,21 +23,24 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     _title = db.Column(db.String(255), nullable=False)
+    _comment = db.Column(db.String(255), nullable=False)
     _content = db.Column(JSON, nullable=False)
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     _channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
 
-    def __init__(self, title, content, user_id, channel_id):
+    def __init__(self, title, comment, content, user_id, channel_id):
         """
         Constructor, 1st step in object creation.
         
         Args:
             title (str): The title of the post.
+            comment (str): The comment of the post.
             content (dict): The content of the post.
             user_id (int): The user who created the post.
             channel_id (int): The channel to which the post belongs.
         """
         self._title = title
+        self._comment = comment
         self._content = content
         self._user_id = user_id
         self._channel_id = channel_id
@@ -49,7 +53,7 @@ class Post(db.Model):
         Returns:
             str: A text representation of how to create the object.
         """
-        return f"Post(id={self.id}, title={self._title}, content={self._content}, user_id={self._user_id}, channel_id={self._channel_id})"
+        return f"Post(id={self.id}, title={self._title}, comment={self._comment}, content={self._content}, user_id={self._user_id}, channel_id={self._channel_id})"
 
     def create(self):
         """
@@ -83,6 +87,7 @@ class Post(db.Model):
         data = {
             "id": self.id,
             "title": self._title,
+            "comment": self._comment,
             "content": self._content,
             "user_name": user.name if user else None,
             "channel_name": channel.name if channel else None
@@ -140,18 +145,18 @@ def initPosts():
         db.create_all()
         """Tester data for table"""
         
-        p1 = Post(title='Penpal Letter', content={'comment': 'Looking forward to your reply!'}, user_id=1, channel_id=1)
-        p2 = Post(title='Game vs Poway', content={'comment': 'Excited for the game!'}, user_id=2, channel_id=2)
-        p3 = Post(title='Game vs Westview', content={'comment': 'Ready to win!'}, user_id=2, channel_id=3)
-        p4 = Post(title='Math Homework', content={'comment': 'Need help with derivatives.'}, user_id=3, channel_id=4)
-        p5 = Post(title='English Essay', content={'comment': 'Struggling with my essay.'}, user_id=3, channel_id=5)
-        p6 = Post(title='Favorite Artist', content={'comment': 'I love this artist!'}, user_id=1, channel_id=6)
-        p7 = Post(title='Music Genre', content={'comment': 'What genre do you like?'}, user_id=1, channel_id=7)
-        p8 = Post(title='Humor', content={'comment': 'Share your funniest jokes!'}, user_id=2, channel_id=8)
-        p9 = Post(title='Memes', content={'comment': 'Post your favorite memes!'}, user_id=2, channel_id=9)
-        p10 = Post(title='Irony', content={'comment': 'Discuss ironic situations.'}, user_id=3, channel_id=10)
-        p11 = Post(title='Cyber Patriots', content={'comment': 'Join the team!'}, user_id=3, channel_id=11)
-        p12 = Post(title='Robotics', content={'comment': 'Building a new robot.'}, user_id=1, channel_id=12)
+        p1 = Post(title='Penpal Letter', comment='Looking forward to your reply!', content={'type': 'letter'}, user_id=1, channel_id=1)
+        p2 = Post(title='Game vs Poway', comment='Excited for the game!', content={'type': 'game'}, user_id=2, channel_id=2)
+        p3 = Post(title='Game vs Westview', comment='Ready to win!', content={'type': 'game'}, user_id=2, channel_id=3)
+        p4 = Post(title='Math Homework', comment='Need help with derivatives.', content={'type': 'homework'}, user_id=3, channel_id=4)
+        p5 = Post(title='English Essay', comment='Struggling with my essay.', content={'type': 'essay'}, user_id=3, channel_id=5)
+        p6 = Post(title='Favorite Artist', comment='I love this artist!', content={'type': 'music'}, user_id=1, channel_id=6)
+        p7 = Post(title='Music Genre', comment='What genre do you like?', content={'type': 'discussion'}, user_id=1, channel_id=7)
+        p8 = Post(title='Humor', comment='Share your funniest jokes!', content={'type': 'humor'}, user_id=2, channel_id=8)
+        p9 = Post(title='Memes', comment='Post your favorite memes!', content={'type': 'memes'}, user_id=2, channel_id=9)
+        p10 = Post(title='Irony', comment='Discuss ironic situations.', content={'type': 'discussion'}, user_id=3, channel_id=10)
+        p11 = Post(title='Cyber Patriots', comment='Join the team!', content={'type': 'activity'}, user_id=3, channel_id=11)
+        p12 = Post(title='Robotics', comment='Building a new robot.', content={'type': 'activity'}, user_id=1, channel_id=12)
         
         posts = [p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12]
         for post in posts:
