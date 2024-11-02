@@ -22,13 +22,36 @@ class Section(db.Model):
     groups = db.relationship('Group', backref='section', lazy=True)
 
     def __init__(self, name, theme=None):
+        """
+        Constructor, 1st step in object creation.
+        
+        Args:
+            name (str): The name of the section.
+            theme (str, optional): The theme of the section. Defaults to None.
+        """
         self._name = name
         self._theme = theme
 
     def __repr__(self):
+        """
+        The __repr__ method is a special method used to represent the object in a string format.
+        Called by the repr() built-in function.
+        
+        Returns:
+            str: A text representation of how to create the object.
+        """
         return f"Section(id={self.id}, name={self._name}, theme={self._theme})"
 
     def create(self):
+        """
+        The create method adds the object to the database and commits the transaction.
+        
+        Uses:
+            The db ORM methods to add and commit the transaction.
+        
+        Raises:
+            Exception: An error occurred when adding the object to the database.
+        """
         try:
             db.session.add(self)
             db.session.commit()
@@ -37,6 +60,12 @@ class Section(db.Model):
             raise e
         
     def read(self):
+        """
+        The read method retrieves the object data from the object's attributes and returns it as a dictionary.
+        
+        Returns:
+            dict: A dictionary containing the section data.
+        """
         return {
             'id': self.id,
             'name': self._name,
@@ -44,15 +73,29 @@ class Section(db.Model):
         }
 
 def initSections():
+    """
+    The initSections function creates the Section table and adds tester data to the table.
+    
+    Uses:
+        The db ORM methods to create the table.
+    
+    Instantiates:
+        Section objects with tester data.
+    
+    Raises:
+        IntegrityError: An error occurred when adding the tester data to the table.
+    """
     with app.app_context():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
         
-        s1 = Section(name='Academics', theme='Education')
-        s2 = Section(name='Sports', theme='Athletics')
-        s3 = Section(name='Entertainment', theme='Media')
-        sections = [s1, s2, s3]
+        s1 = Section(name='Shared Interest')
+        s2 = Section(name='Create and Compete')
+        s3 = Section(name='Vote for the GOAT')
+        s4 = Section(name='Share and Care')
+        s5 = Section(name='Rate and Relate')
+        sections = [s1, s2, s3, s4, s5]
         
         for section in sections:
             try:
@@ -60,4 +103,4 @@ def initSections():
             except IntegrityError:
                 '''fails with bad or duplicate data'''
                 db.session.remove()
-                print(f"Records exist, duplicate email, or error: {section.uid}")
+                print(f"Records exist, duplicate email, or error: {section._name}")
