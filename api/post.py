@@ -47,13 +47,13 @@ class PostAPI:
                 return {'message': 'No input data provided'}, 400
             if 'title' not in data:
                 return {'message': 'Post title is required'}, 400
-            if 'content' not in data:
-                return {'message': 'Post content is required'}, 400
+            if 'comment' not in data:
+                return {'message': 'Post comment is required'}, 400
             if 'channel_id' not in data:
                 return {'message': 'Channel ID is required'}, 400
 
             # Create a new post object using the data from the request
-            post = Post(data['title'], data['content'], current_user.id, data['channel_id'])
+            post = Post(data['title'], data['comment'], current_user.id, data['channel_id'])
             # Save the post object using the Object Relational Mapper (ORM) method defined in the model
             post.create()
             # Return response to the client in JSON format, converting Python dictionaries to JSON format

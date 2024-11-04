@@ -28,22 +28,22 @@ class Post(db.Model):
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     _channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
 
-    def __init__(self, title, comment, content, user_id, channel_id):
+    def __init__(self, title, comment, user_id, channel_id, content={}):
         """
         Constructor, 1st step in object creation.
         
         Args:
             title (str): The title of the post.
             comment (str): The comment of the post.
-            content (dict): The content of the post.
             user_id (int): The user who created the post.
             channel_id (int): The channel to which the post belongs.
+            content (dict): The content of the post.
         """
         self._title = title
         self._comment = comment
-        self._content = content
         self._user_id = user_id
         self._channel_id = channel_id
+        self._content = content
 
     def __repr__(self):
         """
