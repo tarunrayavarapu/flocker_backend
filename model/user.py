@@ -1,4 +1,4 @@
-""" Database dependencies to support sqliteDB examples """
+# user.py
 from flask import current_app
 from flask_login import UserMixin
 from datetime import date
@@ -59,10 +59,8 @@ class User(db.Model, UserMixin):
     _role = db.Column(db.String(20), default="User", nullable=False)
     _pfp = db.Column(db.String(255), unique=False, nullable=True)
    
-    # Define many-to-many relationship with Section model through UserSection table 
-    # Overlaps setting avoids circular dependencies with UserSection class
     posts = db.relationship('Post', backref='author', lazy=True)
-    moderated_groups = db.relationship('Group', backref='moderator', lazy=True)                              
+                                 
     
     def __init__(self, name, uid, password=app.config["DEFAULT_PASSWORD"], role="User", pfp=''):
         """

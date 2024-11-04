@@ -14,19 +14,22 @@ from __init__ import app, db, login_manager  # Key Flask objects
 from api.user import user_api 
 from api.pfp import pfp_api
 from api.post import post_api
+from api.channel import channel_api
 from api.group import group_api
 from api.section import section_api
 # database Initialization functions
 from model.user import User, initUsers
-from model.group import initGroups
-from model.post import initPosts
 from model.section import initSections
+from model.group import initGroups
+from model.channel import initChannels
+from model.post import initPosts
 # server only Views
 
 # register URIs for api endpoints
 app.register_blueprint(user_api)
 app.register_blueprint(pfp_api) 
 app.register_blueprint(post_api)
+app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
 
@@ -130,9 +133,10 @@ custom_cli = AppGroup('custom', help='Custom commands')
 @custom_cli.command('generate_data')
 def generate_data():
     initUsers()
-    initGroups()
-    initPosts()
     initSections()
+    initGroups()
+    initChannels()
+    initPosts()
 
 # Register the custom command group with the Flask application
 app.cli.add_command(custom_cli)
