@@ -2,6 +2,7 @@
 from sqlite3 import IntegrityError
 from sqlalchemy import Text, JSON
 from __init__ import app, db
+from model.group import Group
 
 class Channel(db.Model):
     """
@@ -105,25 +106,45 @@ def initChannels():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
-        
-        c1 = Channel(name='Penpal Letters', group_id=1)
-        c2 = Channel(name='Game vs Poway', group_id=2)
-        c3 = Channel(name='Game vs Westview', group_id=2)
-        c4 = Channel(name='Math', group_id=3)
-        c5 = Channel(name='English', group_id=3)
-        c6 = Channel(name='Artist', group_id=4)
-        c7 = Channel(name='Music Genre', group_id=4)
-        c8 = Channel(name='Humor', group_id=5)
-        c9 = Channel(name='Memes', group_id=5)
-        c10 = Channel(name='Irony', group_id=5)
-        c11 = Channel(name='Cyber Patriots', group_id=6)
-        c12 = Channel(name='Robotics', group_id=6)
 
-        channels = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12]
+        # Home Page Channels
+        general = Group.query.filter_by(_name='General').first()
+        support = Group.query.filter_by(_name='Support').first()
+        home_page_channels = [
+            Channel(name='Announcements', group_id=general.id),
+            Channel(name='Events', group_id=general.id),
+            Channel(name='FAQ', group_id=support.id),
+            Channel(name='Help Desk', group_id=support.id)
+        ]
+        
+        # Shared Interest Channels 
+        limitless_connection = Group.query.filter_by(_name='Limitless Connections').first() 
+        dnhs_football = Group.query.filter_by(_name='DNHS Football').first() 
+        school_subjects = Group.query.filter_by(_name='School Subjects').first()
+        music = Group.query.filter_by(_name='Music').first()
+        satire = Group.query.filter_by(_name='Satire').first()
+        activity_hub = Group.query.filter_by(_name='Activity Hub').first()
+        shared_interest_channels = [
+            Channel(name='Penpal Letters', group_id=limitless_connection.id),
+            Channel(name='Game vs Poway', group_id=dnhs_football.id),
+            Channel(name='Game vs Westview', group_id=dnhs_football.id),
+            Channel(name='Math', group_id=school_subjects.id),
+            Channel(name='English', group_id=school_subjects.id),
+            Channel(name='Artist', group_id=music.id),
+            Channel(name='Music Genre', group_id=music.id),
+            Channel(name='Humor', group_id=satire.id),
+            Channel(name='Memes', group_id=satire.id),
+            Channel(name='Irony', group_id=satire.id),
+            Channel(name='Cyber Patriots', group_id=activity_hub.id),
+            Channel(name='Robotics', group_id=activity_hub.id)
+        ]
+        
+        channels = home_page_channels + shared_interest_channels
         for channel in channels:
             try:
-                channel.create()
+                db.session.add(channel)
+                db.session.commit()
+                print(f"Record created: {repr(channel)}")
             except IntegrityError:
-                '''fails with bad or duplicate data'''
-                db.session.remove()
-                print(f"Records exist, duplicate email, or error: {channel._name}")
+                db.session.rollback()
+                print(f"Records exist, duplicate email, or error: {channel.name}")

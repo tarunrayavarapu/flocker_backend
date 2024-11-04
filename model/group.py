@@ -116,25 +116,27 @@ def initGroups():
         
         # Home Page Groups
         home_page_section = Section.query.filter_by(_name='Home Page').first()
-        hp_g1 = Group(name='General', section_id=home_page_section.id, moderators=[User.query.get(1)]) 
-        hp_g2 = Group(name='Support', section_id=home_page_section.id, moderators=[User.query.get(1)])
-        home_page_groups = [hp_g1, hp_g2]
+        groups = [
+            Group(name='General', section_id=home_page_section.id, moderators=[User.query.get(1)]),
+            Group(name='Support', section_id=home_page_section.id, moderators=[User.query.get(1)])
+        ]
         
         # Shared Interest Groups 
         shared_interest_section = Section.query.filter_by(_name='Shared Interest').first()
-        si_g1 = Group(name='Limitless Connections', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
-        si_g2 = Group(name='DNHS Football', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
-        si_g3 = Group(name='School Subjects', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
-        si_g4 = Group(name='Music', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
-        si_g5 = Group(name='Satire', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
-        si_g6 = Group(name='Activity Hub', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
-        shared_interest_groups = [si_g1, si_g2, si_g3, si_g4, si_g5, si_g6]
+        groups += [
+            Group(name='Limitless Connections', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
+            Group(name='DNHS Football', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
+            Group(name='School Subjects', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
+            Group(name='Music', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
+            Group(name='Satire', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
+            Group(name='Activity Hub', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
+        ]
 
-        groups = home_page_groups + shared_interest_groups
         for group in groups:
             try:
-                group.create()
+                db.session.add(group)
+                db.session.commit()
+                print(f"Record created: {repr(group)}")
             except IntegrityError:
-                '''fails with bad or duplicate data'''
-                db.session.remove()
+                db.session.rollback()
                 print(f"Records exist, duplicate email, or error: {group._name}")
