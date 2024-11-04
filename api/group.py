@@ -1,10 +1,12 @@
 import jwt
 from flask import Blueprint, request, jsonify, current_app, Response, g
 from flask_restful import Api, Resource  # used for REST API building
+from datetime import datetime
 from __init__ import app
 from api.jwt_authorize import token_required
 from model.group import Group
 from model.user import User
+from model.section import Section
 
 """
 This Blueprint object is used to define APIs for the Group model.
@@ -72,6 +74,8 @@ class GroupAPI:
             """
             Update a group.
             """
+            # Obtain the current user from the token required setting in the global context
+            current_user = g.current_user
             # Obtain the request data sent by the RESTful client API
             data = request.get_json()
             # Find the group to update
@@ -188,13 +192,40 @@ class GroupAPI:
             # Return response to the client in JSON format, converting Python dictionaries to JSON format
             return jsonify(group.read())
 
+    class _FILTER(Resource):
+        @token_required()
+        def get(self):
+            """
+            Retrieve all groups under a section by section name.
+            """
+            # Obtain and validate the request data sent by the RESTful client API
+            data = request.get_json()
+            if data is None:
+                return {'message': 'Section data not found'}, 400
+            if 'section_name' not in data:
+                return {'message': 'Section name not found'}, 400
+            
+            # Find the section by name
+            section = Section.query.filter_by(_name=data['section_name']).first()
+            if section is None:
+                return {'message': 'Section not found'}, 404
+            
+            # Find all groups under the section
+            groups = Group.query.filter_by(_section_id=section.id).all()
+            # Prepare a JSON list of all the groups, using list comprehension
+            json_ready = [group.read() for group in groups]
+            # Return a JSON list, converting Python dictionaries to JSON format
+            return jsonify(json_ready)
+
     """
-    Map the _CRUD, _BULK_CRUD, and _MODERATOR classes to the API endpoints for /group, /groups, and /group/moderator.
+    Map the _CRUD, _BULK_CRUD, _MODERATOR, and _FILTER classes to the API endpoints for /group, /groups, /group/moderator, and /group/filter.
     - The API resource class inherits from flask_restful.Resource.
     - The _CRUD class defines the HTTP methods for the API.
     - The _BULK_CRUD class defines the bulk operations for the API.
     - The _MODERATOR class defines the endpoints for managing group moderators.
+    - The _FILTER class defines the endpoints for filtering groups by section name.
     """
     api.add_resource(_CRUD, '/group')
     api.add_resource(_BULK_CRUD, '/groups')
     api.add_resource(_MODERATOR, '/group/moderator')
+    api.add_resource(_FILTER, '/group/filter')
