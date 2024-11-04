@@ -123,13 +123,21 @@ def initGroups():
         
         # Shared Interest Groups 
         shared_interest_section = Section.query.filter_by(_name='Shared Interest').first()
+        create_and_compete_section = Section.query.filter_by(_name='Create and Compete').first()
         groups += [
             Group(name='Limitless Connections', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
             Group(name='DNHS Football', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
             Group(name='School Subjects', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
             Group(name='Music', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
             Group(name='Satire', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
-            Group(name='Activity Hub', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
+            Group(name='Activity Hub', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
+
+            Group(name='Reality Room', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
+            Group(name='Doodle', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
+            Group(name='Elevator Pitch', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
+            Group(name='Zoom n Guess', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
+            Group(name='Culinary Posts', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
+            Group(name='Riddle Room', section_id=create_and_compete_section.id, moderators=[User.query.get(1)])
         ]
 
         for group in groups:
