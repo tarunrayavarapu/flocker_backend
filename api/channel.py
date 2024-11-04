@@ -6,6 +6,7 @@ from __init__ import app
 from api.jwt_authorize import token_required
 from model.channel import Channel
 from model.group import Group
+from model.user import User
 
 """
 This Blueprint object is used to define APIs for the Channel model.
@@ -153,6 +154,31 @@ class ChannelAPI:
             # Return a JSON list, converting Python dictionaries to JSON format
             return jsonify(json_ready)
 
+    class _BULK_FILTER(Resource):
+        @token_required()
+        def get(self):
+            """
+            Retrieve all channels under a group by group name.
+            """
+            # Obtain and validate the request data sent by the RESTful client API
+            data = request.get_json()
+            if data is None:
+                return {'message': 'Group data not found'}, 400
+            if 'group_name' not in data:
+                return {'message': 'Group name not found'}, 400
+            
+            # Find the group by name
+            group = Group.query.filter_by(_name=data['group_name']).first()
+            if group is None:
+                return {'message': 'Group not found'}, 404
+            
+            # Find all channels under the group
+            channels = Channel.query.filter_by(_group_id=group.id).all()
+            # Prepare a JSON list of all the channels, using list comprehension
+            json_ready = [channel.read() for channel in channels]
+            # Return a JSON list, converting Python dictionaries to JSON format
+            return jsonify(json_ready)
+
     class _FILTER(Resource):
         @token_required()
         def get(self):
@@ -184,12 +210,14 @@ class ChannelAPI:
             return jsonify(json_ready)
 
     """
-    Map the _CRUD, _BULK_CRUD, and _FILTER classes to the API endpoints for /channel, /channels, and /channel/filter.
+    Map the _CRUD, _BULK_CRUD, _BULK_FILTER, and _FILTER classes to the API endpoints for /channel, /channels, /channels/filter, and /channel/filter.
     - The API resource class inherits from flask_restful.Resource.
     - The _CRUD class defines the HTTP methods for the API.
     - The _BULK_CRUD class defines the bulk operations for the API.
-    - The _FILTER class defines the endpoints for filtering channels by group name and channel name.
+    - The _BULK_FILTER class defines the endpoints for filtering channels by group name.
+    - The _FILTER class defines the endpoints for filtering a specific channel by group name and channel name.
     """
     api.add_resource(_CRUD, '/channel')
     api.add_resource(_BULK_CRUD, '/channels')
+    api.add_resource(_BULK_FILTER, '/channels/filter')
     api.add_resource(_FILTER, '/channel/filter')
