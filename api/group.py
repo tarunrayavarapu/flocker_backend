@@ -194,7 +194,7 @@ class GroupAPI:
 
     class _BULK_FILTER(Resource):
         @token_required()
-        def get(self):
+        def post(self):
             """
             Retrieve all groups under a section by section name.
             """
@@ -219,7 +219,7 @@ class GroupAPI:
 
     class _FILTER(Resource):
         @token_required()
-        def get(self):
+        def post(self):
             """
             Retrieve a single group by group name.
             """

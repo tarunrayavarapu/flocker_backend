@@ -156,7 +156,7 @@ class ChannelAPI:
 
     class _BULK_FILTER(Resource):
         @token_required()
-        def get(self):
+        def post(self):
             """
             Retrieve all channels under a group by group name.
             """
@@ -181,7 +181,7 @@ class ChannelAPI:
 
     class _FILTER(Resource):
         @token_required()
-        def get(self):
+        def post(self):
             """
             Retrieve a single channel by group name and channel name.
             """
