@@ -1,6 +1,7 @@
 # group.py
 from sqlite3 import IntegrityError
 from __init__ import app, db
+from model.section import Section
 from model.user import User
 
 # Association table for the many-to-many relationship between Group and User (moderators)
@@ -113,14 +114,23 @@ def initGroups():
         db.create_all()
         """Tester data for table"""
         
-        g1 = Group(name='Limitless Connections', section_id=1, moderators=[User.query.get(1)])
-        g2 = Group(name='DNHS Football', section_id=1, moderators=[User.query.get(1)])
-        g3 = Group(name='School Subjects', section_id=1, moderators=[User.query.get(1)])
-        g4 = Group(name='Music', section_id=1, moderators=[User.query.get(1)])
-        g5 = Group(name='Satire', section_id=1, moderators=[User.query.get(1)])
-        g6 = Group(name='Activity Hub', section_id=1, moderators=[User.query.get(1)])
+        # Home Page Groups
+        home_page_section = Section.query.filter_by(_name='Home Page').first()
+        hp_g1 = Group(name='General', section_id=home_page_section.id, moderators=[User.query.get(1)]) 
+        hp_g2 = Group(name='Support', section_id=home_page_section.id, moderators=[User.query.get(1)])
+        home_page_groups = [hp_g1, hp_g2]
+        
+        # Shared Interest Groups 
+        shared_interest_section = Section.query.filter_by(_name='Shared Interest').first()
+        si_g1 = Group(name='Limitless Connections', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
+        si_g2 = Group(name='DNHS Football', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
+        si_g3 = Group(name='School Subjects', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
+        si_g4 = Group(name='Music', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
+        si_g5 = Group(name='Satire', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
+        si_g6 = Group(name='Activity Hub', section_id=shared_interest_section.id, moderators=[User.query.get(1)])
+        shared_interest_groups = [si_g1, si_g2, si_g3, si_g4, si_g5, si_g6]
 
-        groups = [g1, g2, g3, g4, g5, g6]
+        groups = home_page_groups + shared_interest_groups
         for group in groups:
             try:
                 group.create()
