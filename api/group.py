@@ -192,7 +192,7 @@ class GroupAPI:
             # Return response to the client in JSON format, converting Python dictionaries to JSON format
             return jsonify(group.read())
 
-    class _FILTER(Resource):
+    class _BULK_FILTER(Resource):
         @token_required()
         def get(self):
             """
@@ -217,15 +217,39 @@ class GroupAPI:
             # Return a JSON list, converting Python dictionaries to JSON format
             return jsonify(json_ready)
 
+    class _FILTER(Resource):
+        @token_required()
+        def get(self):
+            """
+            Retrieve a groupe.
+            """
+            # Obtain and validate the request data sent by the RESTful client API
+            data = request.get_json()
+            if data is None:
+                return {'message': 'Section data not found'}, 400
+            if 'group_name' not in data:
+                return {'message': 'Group name not found'}, 400
+            
+            # Find the section by name
+            group = Group.query.filter_by(_name=data['group_name']).first()
+            if group is None:
+                return {'message': 'Group not found'}, 404
+            
+            # Prepare a JSON list of all the groups, using list comprehension
+            json_ready = group.read()
+            # Return a JSON list, converting Python dictionaries to JSON format
+            return jsonify(json_ready)
+
+
     """
-    Map the _CRUD, _BULK_CRUD, _MODERATOR, and _FILTER classes to the API endpoints for /group, /groups, /group/moderator, and /group/filter.
+    Map the _CRUD, _BULK_CRUD, _BULK_FILTER, and _FILTER classes to the API endpoints for /group, /groups, /groups/filter, and /group/filter.
     - The API resource class inherits from flask_restful.Resource.
     - The _CRUD class defines the HTTP methods for the API.
     - The _BULK_CRUD class defines the bulk operations for the API.
-    - The _MODERATOR class defines the endpoints for managing group moderators.
-    - The _FILTER class defines the endpoints for filtering groups by section name.
+    - The _BULK_FILTER class defines the endpoints for filtering groups by section name.
+    - The _FILTER class defines the endpoints for filtering a specific group
     """
     api.add_resource(_CRUD, '/group')
     api.add_resource(_BULK_CRUD, '/groups')
-    api.add_resource(_MODERATOR, '/group/moderator')
+    api.add_resource(_BULK_FILTER, '/groups/filter')
     api.add_resource(_FILTER, '/group/filter')
