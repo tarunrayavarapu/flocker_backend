@@ -188,8 +188,7 @@ class PostAPI:
                 return {'message': 'Channel ID not found'}, 400
             
             # Find all posts by channel ID and user ID
-            current_user = g.current_user
-            posts = Post.query.filter_by(_channel_id=data['channel_id'], _user_id=current_user.id).all()
+            posts = Post.query.filter_by(_channel_id=data['channel_id']).all()
             # Prepare a JSON list of all the posts, using list comprehension
             json_ready = [post.read() for post in posts]
             # Return a JSON list, converting Python dictionaries to JSON format
