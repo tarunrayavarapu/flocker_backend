@@ -123,8 +123,6 @@ def initGroups():
         
         # Shared Interest Groups 
         shared_interest_section = Section.query.filter_by(_name='Shared Interest').first()
-        create_and_compete_section = Section.query.filter_by(_name='Create and Compete').first()
-        vote_for_the_goat_section = Section.query.filter_by(_name='Vote for the GOAT').first()
         groups += [
             Group(name='Limitless Connections', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
             Group(name='DNHS Football', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
@@ -132,14 +130,22 @@ def initGroups():
             Group(name='Music', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
             Group(name='Satire', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
             Group(name='Activity Hub', section_id=shared_interest_section.id, moderators=[User.query.get(1)]),
+        ]
 
+        # Create and Compete Groups
+        create_and_compete_section = Section.query.filter_by(_name='Create and Compete').first()
+        groups += [
             Group(name='Reality Room', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
             Group(name='Doodle', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
             Group(name='Elevator Pitch', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
             Group(name='Zoom n Guess', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
             Group(name='Culinary Posts', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
             Group(name='Riddle Room', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
+        ]
 
+        # Vote for the GOAT Groups
+        vote_for_the_goat_section = Section.query.filter_by(_name='Vote for the GOAT').first()
+        groups += [
             Group(name='Internet Debates', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
             Group(name='Calico Vote', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
             Group(name='Dnero Store', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
