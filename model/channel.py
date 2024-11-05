@@ -138,8 +138,26 @@ def initChannels():
             Channel(name='Cyber Patriots', group_id=activity_hub.id),
             Channel(name='Robotics', group_id=activity_hub.id)
         ]
+
+        # P2 channels below:
+
+        # P3 channels below:
         
-        channels = home_page_channels + shared_interest_channels
+        # Vote for the GOAT channels below:
+        internet_debates = Group.query.filter_by(_name='Internet Debates').first() 
+        calico_vote = Group.query.filter_by(_name='Calico Vote').first() 
+        dnero_store = Group.query.filter_by(_name='Dnero Store').first()
+        devrage_debates = Group.query.filter_by(_name='Beverage Debates').first()
+        nfl_goats = Group.query.filter_by(_name='NFL GOATs').first()
+        vote_for_the_goat_channels = [
+            Channel(name='Milk vs Cereal', group_id=internet_debates.id),
+            Channel(name='Hot Dog Sandwich', group_id=internet_debates.id),
+            Channel(name='Pineapple on Pizza', group_id=internet_debates.id),
+            Channel(name='Cats vs Dogs', group_id=internet_debates.id),
+            Channel(name='Coffee or Tea', group_id=internet_debates.id),
+        ]
+        
+        channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels
         for channel in channels:
             try:
                 db.session.add(channel)
