@@ -1,59 +1,51 @@
-# post.py
+# feedback.py
 from sqlite3 import IntegrityError
-from sqlalchemy import Text, JSON
+from sqlalchemy import Text
 from __init__ import app, db
 from model.user import User
-from model.channel import Channel
+from model.post import Post
 
-class Post(db.Model):
+class Feedback(db.Model):
     """
-    Post Model
+    Feedback Model
     
-    The Post class represents an individual contribution or discussion within a channel.
+    The Feedback class represents an individual contribution or discussion within a post.
     
     Attributes:
         id (db.Column): The primary key, an integer representing the unique identifier for the post.
-        _title (db.Column): A string representing the title of the post.
-        _comment (db.Column): A string representing the comment of the post.
-        _content (db.Column): A JSON blob representing the content of the post.
+        _content (db.Column): A Text blob representing the content of the post.
         _user_id (db.Column): An integer representing the user who created the post.
-        _channel_id (db.Column): An integer representing the channel to which the post belongs.
+        _post_id (db.Column): An integer representing the post to which the post belongs.
     """
-    __tablename__ = 'posts'
+    __tablename__ = 'feedbacks'
 
     id = db.Column(db.Integer, primary_key=True)
-    _title = db.Column(db.String(255), nullable=False)
-    _comment = db.Column(db.String(255), nullable=False)
-    _content = db.Column(JSON, nullable=False)
+    _content = db.Column(Text, nullable=False)
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    _channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
+    _post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
 
-    def __init__(self, title, comment, user_id, channel_id, content={}):
+    def __init__(self, content, user_id, post_id):
         """
         Constructor, 1st step in object creation.
-        
-        Args:
+  
             title (str): The title of the post.
-            comment (str): The comment of the post.
+            content (str): The content of the post.
             user_id (int): The user who created the post.
-            channel_id (int): The channel to which the post belongs.
-            content (dict): The content of the post.
+            post_id (int): The post to which the post belongs.
         """
-        self._title = title
-        self._comment = comment
-        self._user_id = user_id
-        self._channel_id = channel_id
         self._content = content
+        self._user_id = user_id
+        self._post_id = post_id
 
     def __repr__(self):
         """
         The __repr__ method is a special method used to represent the object in a string format.
-        Called by the repr(post) built-in function, where post is an instance of the Post class.
+        Called by the repr(post) built-in function, where post is an instance of the Feedback class.
         
         Returns:
             str: A text representation of how to create the object.
         """
-        return f"Post(id={self.id}, title={self._title}, comment={self._comment}, content={self._content}, user_id={self._user_id}, channel_id={self._channel_id})"
+        return f"Feedback(id={self.id}, content={self._content}, user_id={self._user_id}, post_id={self._post_id})"
 
     def create(self):
         """
@@ -77,20 +69,18 @@ class Post(db.Model):
         The read method retrieves the object data from the object's attributes and returns it as a dictionary.
         
         Uses:
-            The Channel.query and User.query methods to retrieve the channel and user objects.
+            The Post.query and User.query methods to retrieve the post and user objects.
         
         Returns:
-            dict: A dictionary containing the post data, including user and channel names.
+            dict: A dictionary containing the post data, including user and post names.
         """
         user = User.query.get(self._user_id)
-        channel = Channel.query.get(self._channel_id)
+        post = Post.query.get(self._post_id)
         data = {
             "id": self.id,
-            "title": self._title,
-            "comment": self._comment,
             "content": self._content,
             "user_name": user.name if user else None,
-            "channel_name": channel.name if channel else None
+            "post_title": post.title if post else None,
         }
         return data
     
@@ -127,15 +117,15 @@ class Post(db.Model):
             db.session.rollback()
             raise e
 
-def initPosts():
+def initFeedbacks():
     """
-    The initPosts function creates the Post table and adds tester data to the table.
+    The initFeedbacks function creates the Feedback table and adds tester data to the table.
     
     Uses:
         The db ORM methods to create the table.
     
     Instantiates:
-        Post objects with tester data.
+        Feedback objects with tester data.
     
     Raises:
         IntegrityError: An error occurred when adding the tester data to the table.
@@ -144,17 +134,17 @@ def initPosts():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
-        posts = [
-            Post(title='Added Group and Channel Select', comment='The Home Page has a Section, on this page we can select Group and Channel to allow blog filtering', content={'type': 'announcement'}, user_id=1, channel_id=1),
-            Post(title='JSON content saving through content"field in database', comment='You could add other dialogs to a post that would allow custom data or even storing reference to uploaded images.', content={'type': 'announcement'}, user_id=1, channel_id=1),
-            Post(title='Allows Post by different Users', comment='Different users seeing content is a key concept in social media.', content={'type': 'announcement'}, user_id=2, channel_id=1),
-        ]
         
-        for post in posts:
+        p1 = Feedback(title='Calculus Help', content='Need help with derivatives.', user_id=1, post_id=1)  
+        p2 = Feedback(title='Game Day', content='Who is coming to the game?', user_id=2, post_id=2)
+        p3 = Feedback(title='New Releases', content='What movies are you excited for?', user_id=3, post_id=3)
+        p4 = Feedback(title='Study Group', content='Meeting at the library.', user_id=1, post_id=1)
+        
+        for post in [p1, p2, p3, p4]:
             try:
                 post.create()
                 print(f"Record created: {repr(post)}")
             except IntegrityError:
                 '''fails with bad or duplicate data'''
                 db.session.remove()
-                print(f"Records exist, duplicate email, or error: {post._title}")
+                print(f"Records exist, duplicate email, or error: {post.uid}")

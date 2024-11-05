@@ -15,13 +15,17 @@ from api.user import user_api
 from api.pfp import pfp_api
 from api.nestImg import nestImg_api # Justin added this, custom format for his website
 from api.post import post_api
+from api.channel import channel_api
 from api.group import group_api
 from api.section import section_api
 from api.nestPost import nestPost_api # Justin added this, custom format for his website
 # database Initialization functions
 from model.user import User, initUsers
+from model.section import initSections
 from model.group import initGroups
+from model.channel import initChannels
 from model.post import initPosts
+
 from model.section import initSections
 from model.nestPost import initNestPosts # Justin added this, custom format for his website
 # server only Views
@@ -30,6 +34,7 @@ from model.nestPost import initNestPosts # Justin added this, custom format for 
 app.register_blueprint(user_api)
 app.register_blueprint(pfp_api) 
 app.register_blueprint(post_api)
+app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
 # Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
@@ -136,7 +141,9 @@ custom_cli = AppGroup('custom', help='Custom commands')
 @custom_cli.command('generate_data')
 def generate_data():
     initUsers()
+    initSections()
     initGroups()
+    initChannels()
     initPosts()
     initSections()
     initNestPosts()
