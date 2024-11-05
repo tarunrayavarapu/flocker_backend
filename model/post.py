@@ -144,14 +144,12 @@ def initPosts():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
+        posts = [
+            Post(title='Added Group and Channel Select', comment='The Home Page has a Section, on this page we can select Group and Channel to allow blog filtering', content={'type': 'announcement'}, user_id=1, channel_id=1),
+            Post(title='JSON content saving through content"field in database', comment='You could add other dialogs to a post that would allow custom data or even storing reference to uploaded images.', content={'type': 'announcement'}, user_id=1, channel_id=1),
+            Post(title='Allows Post by different Users', comment='Different users seeing content is a key concept in social media.', content={'type': 'announcement'}, user_id=2, channel_id=1),
+        ]
         
-        p1 = Post(title='Penpal Letter', comment='Looking forward to your reply!', content={'type': 'letter'}, user_id=1, channel_id=5)
-        p2 = Post(title='Game vs Poway', comment='Excited for the game!', content={'type': 'game'}, user_id=2, channel_id=6)
-        p3 = Post(title='Game vs Westview', comment='Ready to win!', content={'type': 'game'}, user_id=2, channel_id=6)
-        p4 = Post(title='Math Homework', comment='Need help with derivatives.', content={'type': 'homework'}, user_id=3, channel_id=8)
-        p5 = Post(title='English Essay', comment='Struggling with my essay.', content={'type': 'essay'}, user_id=3, channel_id=9)
-        
-        posts = [p1, p2, p3, p4, p5 ]
         for post in posts:
             try:
                 post.create()
