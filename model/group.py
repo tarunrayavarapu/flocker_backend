@@ -153,6 +153,15 @@ def initGroups():
             Group(name='NFL GOATs', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
             Group(name='Genres', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)])
         ]
+        
+        # Rate and Relate Groups
+        rate_and_relate_section = Section.query.filter_by(_name='Rate and Relate').first()
+        groups += [
+            Group(name='Instabox', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
+            Group(name='Flavor Fusion', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
+            Group(name='Book Reviews', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
+            Group(name='Update The Nest', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
+        ]
 
         for group in groups:
             try:
