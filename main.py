@@ -148,7 +148,6 @@ def generate_data():
     initGroups()
     initChannels()
     initPosts()
-    initSections()
     initNestPosts()
     initVotes()
 
