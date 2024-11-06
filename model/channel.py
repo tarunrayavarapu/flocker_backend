@@ -201,6 +201,17 @@ def initChannels():
             Channel(name='Coffee or Tea', group_id=internet_debates.id),
         ]
         
+        # P5 Channels: 
+        book_reviews = Group.query.filter_by(_name='Book Reviews').first() 
+        instabox = Group.query.filter_by(_name='Instabox').first() 
+        flavor_fusion = Group.query.filter_by(_name='Flavor Fusion').first()
+        update_the_nest = Group.query.filter_by(_name='Update The Nest').first()
+        rate_and_relate_channels = [
+            Channel(name='Fiction Books', group_id=book_reviews.id),
+            Channel(name='Nonfiction Books', group_id=book_reviews.id),
+        ]
+        
+        
         channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels
         for channel in channels:
             try:
