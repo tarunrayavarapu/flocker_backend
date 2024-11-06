@@ -190,8 +190,9 @@ def initChannels():
         internet_debates = Group.query.filter_by(_name='Internet Debates').first() 
         calico_vote = Group.query.filter_by(_name='Calico Vote').first() 
         dnero_store = Group.query.filter_by(_name='Dnero Store').first()
-        devrage_debates = Group.query.filter_by(_name='Beverage Debates').first()
+        beverage_debates = Group.query.filter_by(_name='Beverage Debates').first()
         nfl_goats = Group.query.filter_by(_name='NFL GOATs').first()
+        car_debates = Group.query.filter_by(_name='Car Debates').first()
         vote_for_the_goat_channels = [
             Channel(name='Milk vs Cereal', group_id=internet_debates.id),
             Channel(name='Hot Dog Sandwich', group_id=internet_debates.id),
