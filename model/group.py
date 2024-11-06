@@ -96,6 +96,60 @@ class Group(db.Model):
             'moderators': [moderator.id for moderator in self.moderators]
         }
         
+    def update(self, inputs):
+        """
+        Updates the group object with new data.
+        
+        Args:
+            inputs (dict): A dictionary containing the new data for the group.
+        
+        Returns:
+            Group: The updated group object, or None on error.
+        """
+        if not isinstance(inputs, dict):
+            return self
+
+        name = inputs.get("name", "")
+        section_id = inputs.get("section_id", None)
+
+        # Update table with new data
+        if name:
+            self._name = name
+        if section_id:
+            self._section_id = section_id
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return None
+        return self
+        
+    @staticmethod
+    def restore(data, users):
+        groups = {}
+        for group_data in data:
+            _ = group_data.pop('id', None)  # Remove 'id' from group_data
+            name = group_data.get("name", None)
+            group = Group.query.filter_by(_name=name).first()
+            if group:
+                group.update(group_data)
+            else:
+                group = Group(**group_data)
+                group.create() 
+
+        # Restore moderators relationship (TBD)
+        """
+        for group_data in data:
+            group = groups[group_data['name']]
+            if 'moderators' in group_data:
+                for moderator_id in group_data['moderators']:
+                    moderator = users[moderator_id]
+                    group.moderators.append(moderator)
+        db.session.commit()
+        """
+        return groups
+            
 def initGroups():
     """
     The initGroups function creates the Group table and adds tester data to the table.

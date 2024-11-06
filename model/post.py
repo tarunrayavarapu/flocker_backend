@@ -94,21 +94,38 @@ class Post(db.Model):
         }
         return data
     
-    def update(self):
+
+    def update(self, inputs):
         """
-        The update method commits the transaction to the database.
+        Updates the post object with new data.
         
-        Uses:
-            The db ORM method to commit the transaction.
+        Args:
+            inputs (dict): A dictionary containing the new data for the post.
         
-        Raises:
-            Exception: An error occurred when updating the object in the database.
+        Returns:
+            Post: The updated post object, or None on error.
         """
+        if not isinstance(inputs, dict):
+            return self
+
+        title = inputs.get("title", "")
+        content = inputs.get("content", "")
+        channel_id = inputs.get("channel_id", None)
+
+        # Update table with new data
+        if title:
+            self._title = title
+        if content:
+            self._content = content
+        if channel_id:
+            self._channel_id = channel_id
+
         try:
             db.session.commit()
-        except Exception as e:
+        except IntegrityError:
             db.session.rollback()
-            raise e
+            return None
+        return self
     
     def delete(self):
         """
@@ -126,7 +143,19 @@ class Post(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
-
+        
+    @staticmethod
+    def restore(data):
+        for post_data in data:
+            _ = post_data.pop('id', None)  # Remove 'id' from post_data
+            title = post_data.get("title", None)
+            post = Post.query.filter_by(_title=title).first()
+            if post:
+                post.update(post_data)
+            else:
+                post = Post(**post_data)
+                post.create()
+        
 def initPosts():
     """
     The initPosts function creates the Post table and adds tester data to the table.
