@@ -151,7 +151,8 @@ def initGroups():
             Group(name='Dnero Store', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
             Group(name='Beverage Debates', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
             Group(name='NFL GOATs', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
-            Group(name='Genres', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)])
+            Group(name='Genres', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
+            Group(name='Car Debates', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)])
         ]
         
         # Rate and Relate Groups
