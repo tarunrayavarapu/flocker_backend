@@ -3,6 +3,12 @@ import os
 from werkzeug.utils import secure_filename
 from __init__ import app
 
+def default_car_decode():
+        img_path = f"{app.config['UPLOAD_FOLDER']}/no_car.jpg"
+        with open(img_path, 'rb') as img_file:
+            base64_encoded = base64.b64encode(img_file.read()).decode('utf-8')
+        return base64_encoded
+
 def car_base64_decode(user_id, user_car):
     """
     Reads a user's car picture from the server.
