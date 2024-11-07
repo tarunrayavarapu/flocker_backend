@@ -2,7 +2,7 @@ from flask import Blueprint, g, request
 from flask_restful import Api, Resource
 from api.jwt_authorize import token_required
 from model.user import User
-from model.carPhoto import car_base64_decode, car_base64_upload, car_file_delete
+from model.carPhoto import car_base64_decode, car_base64_upload, car_file_delete, default_car_decode
 
 car_api = Blueprint('car_photo_api', __name__, url_prefix='/api/id')
 api = Api(car_api)
@@ -32,7 +32,8 @@ class _CarPhoto(Resource):
         current_user = g.current_user
 
         if not current_user.car or not current_user.car == "":
-            return {"message": "Car picture is not set."}, 404
+            return {"message": "Car picture is not set.",
+                    "car": default_car_decode()}, 404
         
         base64_encode = car_base64_decode(current_user.uid, current_user.car)
 
