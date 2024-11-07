@@ -2,6 +2,7 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 import os
@@ -79,3 +80,5 @@ app.config['GITHUB_TARGET_NAME'] = os.environ.get('GITHUB_TARGET_NAME') or 'nigh
 app.config['KASM_SERVER'] = os.environ.get('KASM_SERVER') or 'https://kasm.nighthawkcodingsociety.com'
 app.config['KASM_API_KEY'] = os.environ.get('KASM_API_KEY') or None
 app.config['KASM_API_KEY_SECRET'] = os.environ.get('KASM_API_KEY_SECRET') or None
+
+socketio = SocketIO(app, cors_allowed_origins=['http://localhost:4887', 'http://127.0.0.1:4887', 'https://nighthawkcoders.github.io'])
