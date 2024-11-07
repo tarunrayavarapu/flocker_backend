@@ -28,7 +28,7 @@ class Post(db.Model):
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     _channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
 
-    def __init__(self, title, comment, user_id, channel_id, content={}):
+    def __init__(self, title, comment, user_id=None, channel_id=None, content={}, user_name=None, channel_name=None):
         """
         Constructor, 1st step in object creation.
         
@@ -111,6 +111,21 @@ class Post(db.Model):
         title = inputs.get("title", "")
         content = inputs.get("content", "")
         channel_id = inputs.get("channel_id", None)
+        user_name = inputs.get("user_name", None)
+        channel_name = inputs.get("channel_name", None)
+
+        # If channel_name is provided, look up the corresponding channel_id
+        if channel_name:
+            channel = Channel.query.filter_by(_name=channel_name).first()
+            if channel:
+                channel_id = channel.id
+                
+        if user_name:
+            user = User.query.filter_by(_name=user_name).first()
+            if user:
+                user_id = user.id
+            else:
+                return None
 
         # Update table with new data
         if title:
@@ -119,7 +134,9 @@ class Post(db.Model):
             self._content = content
         if channel_id:
             self._channel_id = channel_id
-
+        if user_id:
+            self._user_id = user_id
+            
         try:
             db.session.commit()
         except IntegrityError:
@@ -154,6 +171,7 @@ class Post(db.Model):
                 post.update(post_data)
             else:
                 post = Post(**post_data)
+                post.update(post_data)
                 post.create()
         
 def initPosts():
