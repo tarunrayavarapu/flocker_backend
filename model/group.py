@@ -196,6 +196,17 @@ def initGroups():
             Group(name='Culinary Posts', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
             Group(name='Riddle Room', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
         ]
+        
+        # Share and Care Groups
+        share_and_care = Section.query.filter_by(_name='Share and Care').first()
+        groups += [
+            Group(name='DNHS Cafe', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='Cipher', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='Chess Champion', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='Underground Music', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='The Hungry Games', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='REVVIT', section_id=share_and_care.id, moderators=[User.query.get(1)])
+        ]
 
         # Vote for the GOAT Groups
         vote_for_the_goat_section = Section.query.filter_by(_name='Vote for the GOAT').first()
