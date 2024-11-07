@@ -181,14 +181,21 @@ def initChannels():
             Channel(name='Cyber Patriots', group_id=activity_hub.id),
             Channel(name='Robotics', group_id=activity_hub.id)
         ]
+        
+        #P3 Channels Below
+         # Share and Care channels below:
+        DNHSCafe = Group.query.filter_by(_name='Study Room').first()
+        share_and_care_channels = [
+            Channel(name='Math 📓📈', group_id=limitless_connection.id),
+            Channel(name='Chemistry 👩🏻‍🔬🧪', group_id=limitless_connection.id),
+            Channel(name='Biology 🧬🔬', group_id=limitless_connection.id),
+            Channel(name='English 🍎📝', group_id=limitless_connection.id),
+            Channel(name='Coding 💻👾', group_id=limitless_connection.id),
+            Channel(name='History 📚🏛️', group_id=limitless_connection.id),   
+        ]
 
         # P2 channels below:
-
-        # Share and Care channels below:
-        DNHSCafe = Group.query.filter_by(_name='Calico Vote').first()
-        share_and_care_channels = [
-            Channel(name='', group_id=limitless_connection.id),
-        ]
+        
         # Vote for the GOAT channels below:
         internet_debates = Group.query.filter_by(_name='Internet Debates').first() 
         calico_vote = Group.query.filter_by(_name='Calico Vote').first() 
