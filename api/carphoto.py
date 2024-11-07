@@ -30,13 +30,16 @@ class _CarPhoto(Resource):
     @token_required()
     def get(self):
         current_user = g.current_user
-        if current_user.car:
-            base64_encode = car_base64_decode(current_user.uid, current_user.car)
-            if not base64_encode:
-                return {'message': 'An error occurred while reading the car picture.'}, 500
-            return {'car': base64_encode}, 200
-        else:
-            return {'message': 'Car picture is not set.'}, 404
+
+        if not current_user.car or not current_user.car == "":
+            return {"message": "Car picture is not set."}, 404
+        
+        base64_encode = car_base64_decode(current_user.uid, current_user.car)
+
+        if not base64_encode:
+            return {'message': 'An error occurred while reading the car picture.'}, 500
+        
+        return {'car': base64_encode}, 200
 
     @token_required()
     def delete(self):
