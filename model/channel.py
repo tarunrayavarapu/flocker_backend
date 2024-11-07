@@ -199,6 +199,12 @@ def initChannels():
             Channel(name='Pineapple on Pizza', group_id=internet_debates.id),
             Channel(name='Cats vs Dogs', group_id=internet_debates.id),
             Channel(name='Coffee or Tea', group_id=internet_debates.id),
+            Channel(name='Adventure Play House', group_id=calico_vote.id),
+            Channel(name='Sylvanian Family Restraunt House', group_id=calico_vote.id),
+            Channel(name='Magical Mermaid Castle House', group_id=calico_vote.id),
+            Channel(name='Woody School House', group_id=calico_vote.id),
+            Channel(name='Spooky Suprise Haunted House', group_id=calico_vote.id),
+            Channel(name='Brick Oven Bakery House', group_id=calico_vote.id),
         ]
         
         channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels
