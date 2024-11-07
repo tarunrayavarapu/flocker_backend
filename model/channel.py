@@ -215,6 +215,10 @@ def initChannels():
             Channel(name='Woody School House', group_id=calico_vote.id),
             Channel(name='Spooky Suprise Haunted House', group_id=calico_vote.id),
             Channel(name='Brick Oven Bakery House', group_id=calico_vote.id),
+            Channel(name='Food and Drink', group_id=dnero_store.id),
+            Channel(name='Spirit', group_id=dnero_store.id),
+            Channel(name='Limited Edition', group_id=dnero_store.id),
+            Channel(name='Gift Cards', group_id=dnero_store.id),
         ]
         
         # P5 Channels: 
