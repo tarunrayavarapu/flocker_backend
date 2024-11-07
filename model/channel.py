@@ -184,8 +184,11 @@ def initChannels():
 
         # P2 channels below:
 
-        # P3 channels below:
-        
+        # Share and Care channels below:
+        DNHSCafe = Group.query.filter_by(_name='Calico Vote').first()
+        share_and_care_channels = [
+            Channel(name='', group_id=limitless_connection.id),
+        ]
         # Vote for the GOAT channels below:
         internet_debates = Group.query.filter_by(_name='Internet Debates').first() 
         calico_vote = Group.query.filter_by(_name='Calico Vote').first() 

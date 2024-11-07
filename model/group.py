@@ -217,6 +217,11 @@ def initGroups():
             Group(name='Book Reviews', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
             Group(name='Update The Nest', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
         ]
+        # Share and Care Groups
+        share_and_care = Section.query.filter_by(_name='Share and Care').first()
+        groups += [
+            Group(name='DNHS Cafe', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+        ]
 
         for group in groups:
             try:
