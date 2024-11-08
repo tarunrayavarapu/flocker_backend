@@ -71,6 +71,50 @@ class Section(db.Model):
             'name': self._name,
             'theme': self._theme
         }
+        
+    def update(self, inputs):
+        """
+        Updates the section object with new data.
+        
+        Args:
+            inputs (dict): A dictionary containing the new data for the section.
+        
+        Returns:
+            Section: The updated section object, or None on error.
+        """
+        if not isinstance(inputs, dict):
+            return self
+
+        name = inputs.get("name", "")
+        theme = inputs.get("theme", "")
+
+        # Update table with new data
+        if name:
+            self._name = name
+        if theme:
+            self._theme = theme
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return None
+        return self
+    
+    @staticmethod
+    def restore(data):
+        sections = {}
+        for section_data in data:
+            _ = section_data.pop('id', None)  # Remove 'id' from section_data
+            name = section_data.get("name", None)
+            section = Section.query.filter_by(_name=name).first()
+            if section:
+                section.update(section_data)
+            else:
+                section = Section(**section_data)
+                section.create()        
+        db.session.commit()
+        return sections
 
 def initSections():
     """

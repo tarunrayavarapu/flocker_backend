@@ -28,7 +28,7 @@ class Post(db.Model):
     _user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     _channel_id = db.Column(db.Integer, db.ForeignKey('channels.id'), nullable=False)
 
-    def __init__(self, title, comment, user_id, channel_id, content={}):
+    def __init__(self, title, comment, user_id=None, channel_id=None, content={}, user_name=None, channel_name=None):
         """
         Constructor, 1st step in object creation.
         
@@ -94,21 +94,55 @@ class Post(db.Model):
         }
         return data
     
-    def update(self):
+
+    def update(self, inputs):
         """
-        The update method commits the transaction to the database.
+        Updates the post object with new data.
         
-        Uses:
-            The db ORM method to commit the transaction.
+        Args:
+            inputs (dict): A dictionary containing the new data for the post.
         
-        Raises:
-            Exception: An error occurred when updating the object in the database.
+        Returns:
+            Post: The updated post object, or None on error.
         """
+        if not isinstance(inputs, dict):
+            return self
+
+        title = inputs.get("title", "")
+        content = inputs.get("content", "")
+        channel_id = inputs.get("channel_id", None)
+        user_name = inputs.get("user_name", None)
+        channel_name = inputs.get("channel_name", None)
+
+        # If channel_name is provided, look up the corresponding channel_id
+        if channel_name:
+            channel = Channel.query.filter_by(_name=channel_name).first()
+            if channel:
+                channel_id = channel.id
+                
+        if user_name:
+            user = User.query.filter_by(_name=user_name).first()
+            if user:
+                user_id = user.id
+            else:
+                return None
+
+        # Update table with new data
+        if title:
+            self._title = title
+        if content:
+            self._content = content
+        if channel_id:
+            self._channel_id = channel_id
+        if user_id:
+            self._user_id = user_id
+            
         try:
             db.session.commit()
-        except Exception as e:
+        except IntegrityError:
             db.session.rollback()
-            raise e
+            return None
+        return self
     
     def delete(self):
         """
@@ -126,7 +160,20 @@ class Post(db.Model):
         except Exception as e:
             db.session.rollback()
             raise e
-
+        
+    @staticmethod
+    def restore(data):
+        for post_data in data:
+            _ = post_data.pop('id', None)  # Remove 'id' from post_data
+            title = post_data.get("title", None)
+            post = Post.query.filter_by(_title=title).first()
+            if post:
+                post.update(post_data)
+            else:
+                post = Post(**post_data)
+                post.update(post_data)
+                post.create()
+        
 def initPosts():
     """
     The initPosts function creates the Post table and adds tester data to the table.
@@ -144,14 +191,12 @@ def initPosts():
         """Create database and tables"""
         db.create_all()
         """Tester data for table"""
+        posts = [
+            Post(title='Added Group and Channel Select', comment='The Home Page has a Section, on this page we can select Group and Channel to allow blog filtering', content={'type': 'announcement'}, user_id=1, channel_id=1),
+            Post(title='JSON content saving through content"field in database', comment='You could add other dialogs to a post that would allow custom data or even storing reference to uploaded images.', content={'type': 'announcement'}, user_id=1, channel_id=1),
+            Post(title='Allows Post by different Users', comment='Different users seeing content is a key concept in social media.', content={'type': 'announcement'}, user_id=2, channel_id=1),
+        ]
         
-        p1 = Post(title='Penpal Letter', comment='Looking forward to your reply!', content={'type': 'letter'}, user_id=1, channel_id=5)
-        p2 = Post(title='Game vs Poway', comment='Excited for the game!', content={'type': 'game'}, user_id=2, channel_id=6)
-        p3 = Post(title='Game vs Westview', comment='Ready to win!', content={'type': 'game'}, user_id=2, channel_id=6)
-        p4 = Post(title='Math Homework', comment='Need help with derivatives.', content={'type': 'homework'}, user_id=3, channel_id=8)
-        p5 = Post(title='English Essay', comment='Struggling with my essay.', content={'type': 'essay'}, user_id=3, channel_id=9)
-        
-        posts = [p1, p2, p3, p4, p5 ]
         for post in posts:
             try:
                 post.create()

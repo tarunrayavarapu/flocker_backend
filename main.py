@@ -1,4 +1,6 @@
 # imports from flask
+import json
+import os
 from urllib.parse import urljoin, urlparse
 from flask import abort, redirect, render_template, request, send_from_directory, url_for, jsonify  # import render_template from "public" flask libraries
 from flask_login import current_user, login_user, logout_user
@@ -7,6 +9,8 @@ from flask_login import current_user, login_required
 from flask import current_app
 from werkzeug.security import generate_password_hash
 from flask_socketio import join_room
+import shutil
+
 
 
 # import "objects" from "this" project
@@ -15,25 +19,37 @@ from __init__ import app, db, login_manager, socketio  # Key Flask objects
 # API endpoints
 from api.user import user_api 
 from api.pfp import pfp_api
+from api.nestImg import nestImg_api # Justin added this, custom format for his website
 from api.post import post_api
 from api.channel import channel_api
 from api.group import group_api
 from api.section import section_api
+from api.nestPost import nestPost_api # Justin added this, custom format for his website
+from api.messages_api import messages_api # Adi added this, messages for his website
+
+from api.vote import vote_api
 # database Initialization functions
 from model.user import User, initUsers
-from model.section import initSections
-from model.group import initGroups
-from model.channel import initChannels
-from model.post import initPosts
+from model.section import Section, initSections
+from model.group import Group, initGroups
+from model.channel import Channel, initChannels
+from model.post import Post, initPosts
+from model.nestPost import NestPost, initNestPosts # Justin added this, custom format for his website
+from model.vote import Vote, initVotes
 # server only Views
 
 # register URIs for api endpoints
+app.register_blueprint(messages_api) # Adi added this, messages for his website
 app.register_blueprint(user_api)
 app.register_blueprint(pfp_api) 
 app.register_blueprint(post_api)
 app.register_blueprint(channel_api)
 app.register_blueprint(group_api)
 app.register_blueprint(section_api)
+# Added new files to create nestPosts, uses a different format than Mortensen and didn't want to touch his junk
+app.register_blueprint(nestPost_api)
+app.register_blueprint(nestImg_api)
+app.register_blueprint(vote_api)
 
 # Tell Flask-Login the view function name of your login route
 login_manager.login_view = "login"
@@ -139,22 +155,71 @@ def generate_data():
     initGroups()
     initChannels()
     initPosts()
-
-@socketio.on('join')
-def join(room):
-    join_room(room)
-
-@socketio.on("sendMessage")
-@login_required
-def sendMessage(userID,json,methods=["POST"]):
-    data = json
-    payload = {
-        "name":userID.name,
-        "message":data["message"]
-    }
-    socketio.emit("recieveMessage",payload)
+    initNestPosts()
+    initVotes()
     
+# Backup the old database
+def backup_database(db_uri, backup_uri):
+    """Backup the current database."""
+    if backup_uri:
+        db_path = db_uri.replace('sqlite:///', 'instance/')
+        backup_path = backup_uri.replace('sqlite:///', 'instance/')
+        shutil.copyfile(db_path, backup_path)
+        print(f"Database backed up to {backup_path}")
+    else:
+        print("Backup not supported for production database.")
 
+# Extract data from the existing database
+def extract_data():
+    data = {}
+    with app.app_context():
+        data['users'] = [user.read() for user in User.query.all()]
+        data['sections'] = [section.read() for section in Section.query.all()]
+        data['groups'] = [group.read() for group in Group.query.all()]
+        data['channels'] = [channel.read() for channel in Channel.query.all()]
+        data['posts'] = [post.read() for post in Post.query.all()]
+    return data
+
+# Save extracted data to JSON files
+def save_data_to_json(data, directory='backup'):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    for table, records in data.items():
+        with open(os.path.join(directory, f'{table}.json'), 'w') as f:
+            json.dump(records, f)
+    print(f"Data backed up to {directory} directory.")
+
+# Load data from JSON files
+def load_data_from_json(directory='backup'):
+    data = {}
+    for table in ['users', 'sections', 'groups', 'channels', 'posts']:
+        with open(os.path.join(directory, f'{table}.json'), 'r') as f:
+            data[table] = json.load(f)
+    return data
+
+# Restore data to the new database
+def restore_data(data):
+    with app.app_context():
+        users = User.restore(data['users'])
+        _ = Section.restore(data['sections'])
+        _ = Group.restore(data['groups'], users)
+        _ = Channel.restore(data['channels'])
+        _ = Post.restore(data['posts'])
+    print("Data restored to the new database.")
+
+# Define a command to backup data
+@custom_cli.command('backup_data')
+def backup_data():
+    data = extract_data()
+    save_data_to_json(data)
+    backup_database(app.config['SQLALCHEMY_DATABASE_URI'], app.config['SQLALCHEMY_BACKUP_URI'])
+
+# Define a command to restore data
+@custom_cli.command('restore_data')
+def restore_data_command():
+    data = load_data_from_json()
+    restore_data(data)
+    
 # Register the custom command group with the Flask application
 app.cli.add_command(custom_cli)
         

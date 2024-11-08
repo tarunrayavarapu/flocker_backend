@@ -96,6 +96,60 @@ class Group(db.Model):
             'moderators': [moderator.id for moderator in self.moderators]
         }
         
+    def update(self, inputs):
+        """
+        Updates the group object with new data.
+        
+        Args:
+            inputs (dict): A dictionary containing the new data for the group.
+        
+        Returns:
+            Group: The updated group object, or None on error.
+        """
+        if not isinstance(inputs, dict):
+            return self
+
+        name = inputs.get("name", "")
+        section_id = inputs.get("section_id", None)
+
+        # Update table with new data
+        if name:
+            self._name = name
+        if section_id:
+            self._section_id = section_id
+
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return None
+        return self
+        
+    @staticmethod
+    def restore(data, users):
+        groups = {}
+        for group_data in data:
+            _ = group_data.pop('id', None)  # Remove 'id' from group_data
+            name = group_data.get("name", None)
+            group = Group.query.filter_by(_name=name).first()
+            if group:
+                group.update(group_data)
+            else:
+                group = Group(**group_data)
+                group.create() 
+
+        # Restore moderators relationship (TBD)
+        """
+        for group_data in data:
+            group = groups[group_data['name']]
+            if 'moderators' in group_data:
+                for moderator_id in group_data['moderators']:
+                    moderator = users[moderator_id]
+                    group.moderators.append(moderator)
+        db.session.commit()
+        """
+        return groups
+            
 def initGroups():
     """
     The initGroups function creates the Group table and adds tester data to the table.
@@ -142,6 +196,17 @@ def initGroups():
             Group(name='Culinary Posts', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
             Group(name='Riddle Room', section_id=create_and_compete_section.id, moderators=[User.query.get(1)]),
         ]
+        
+        # Share and Care Groups
+        share_and_care = Section.query.filter_by(_name='Share and Care').first()
+        groups += [
+            Group(name='DNHS Cafe', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='Cipher', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='Chess Champion', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='Underground Music', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='The Hungry Games', section_id=share_and_care.id, moderators=[User.query.get(1)]),
+            Group(name='REVVIT', section_id=share_and_care.id, moderators=[User.query.get(1)])
+        ]
 
         # Vote for the GOAT Groups
         vote_for_the_goat_section = Section.query.filter_by(_name='Vote for the GOAT').first()
@@ -151,7 +216,17 @@ def initGroups():
             Group(name='Dnero Store', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
             Group(name='Beverage Debates', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
             Group(name='NFL GOATs', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
-            Group(name='Genres', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)])
+            Group(name='Genres', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)]),
+            Group(name='Car Debates', section_id=vote_for_the_goat_section.id, moderators=[User.query.get(1)])
+        ]
+        
+        # Rate and Relate Groups
+        rate_and_relate_section = Section.query.filter_by(_name='Rate and Relate').first()
+        groups += [
+            Group(name='Instabox', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
+            Group(name='Flavor Fusion', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
+            Group(name='Book Reviews', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
+            Group(name='Update The Nest', section_id=rate_and_relate_section.id, moderators=[User.query.get(1)]),
         ]
 
         for group in groups:
