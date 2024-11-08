@@ -215,6 +215,10 @@ def initChannels():
             Channel(name='Woody School House', group_id=calico_vote.id),
             Channel(name='Spooky Suprise Haunted House', group_id=calico_vote.id),
             Channel(name='Brick Oven Bakery House', group_id=calico_vote.id),
+            Channel(name='Food and Drink', group_id=dnero_store.id),
+            Channel(name='Spirit', group_id=dnero_store.id),
+            Channel(name='Limited Edition', group_id=dnero_store.id),
+            Channel(name='Gift Cards', group_id=dnero_store.id),
         ]
         
         # P5 Channels: 
@@ -225,10 +229,11 @@ def initChannels():
         rate_and_relate_channels = [
             Channel(name='Fiction Books', group_id=book_reviews.id),
             Channel(name='Nonfiction Books', group_id=book_reviews.id),
+            Channel(name='Combos', group_id=flavor_fusion.id),
         ]
         
         
-        channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels
+        channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels + rate_and_relate_channels
         for channel in channels:
             try:
                 db.session.add(channel)
