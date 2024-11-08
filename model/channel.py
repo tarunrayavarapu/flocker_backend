@@ -233,10 +233,11 @@ def initChannels():
         rate_and_relate_channels = [
             Channel(name='Fiction Books', group_id=book_reviews.id),
             Channel(name='Nonfiction Books', group_id=book_reviews.id),
+            Channel(name='Combos', group_id=flavor_fusion.id),
         ]
         
         
-        channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels
+        channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels + rate_and_relate_channels
         for channel in channels:
             try:
                 db.session.add(channel)
