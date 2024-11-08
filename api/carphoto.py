@@ -30,8 +30,7 @@ class _CarPhoto(Resource):
     @token_required()
     def get(self):
         current_user = g.current_user
-
-        if not current_user.car or not current_user.car == "":
+        if not current_user.car or current_user.car == "":
             return {"message": "Car picture is not set.",
                     "car": default_car_decode()}, 404
         
