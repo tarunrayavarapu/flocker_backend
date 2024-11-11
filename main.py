@@ -8,14 +8,12 @@ from flask.cli import AppGroup
 from flask_login import current_user, login_required
 from flask import current_app
 from werkzeug.security import generate_password_hash
-from flask_socketio import join_room
 import shutil
 
 
 
 # import "objects" from "this" project
-from __init__ import app, db, login_manager, socketio  # Key Flask objects 
-
+from __init__ import app, db, login_manager  # Key Flask objects 
 # API endpoints
 from api.user import user_api 
 from api.pfp import pfp_api
