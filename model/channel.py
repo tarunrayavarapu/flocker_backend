@@ -209,6 +209,10 @@ def initChannels():
             Channel(name='Pineapple on Pizza', group_id=internet_debates.id),
             Channel(name='Cats vs Dogs', group_id=internet_debates.id),
             Channel(name='Coffee or Tea', group_id=internet_debates.id),
+            Channel(name='Economy Cars', group_id=car_debates.id),
+            Channel(name='Luxury Cars', group_id=car_debates.id),
+            Channel(name='Vintage Cars', group_id=car_debates.id),
+            Channel(name='Student Cars', group_id=car_debates.id),
             Channel(name='Adventure Play House', group_id=calico_vote.id),
             Channel(name='Sylvanian Family Restraunt House', group_id=calico_vote.id),
             Channel(name='Magical Mermaid Castle House', group_id=calico_vote.id),
@@ -229,10 +233,11 @@ def initChannels():
         rate_and_relate_channels = [
             Channel(name='Fiction Books', group_id=book_reviews.id),
             Channel(name='Nonfiction Books', group_id=book_reviews.id),
+            Channel(name='Combos', group_id=flavor_fusion.id),
         ]
         
         
-        channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels
+        channels = home_page_channels + shared_interest_channels + vote_for_the_goat_channels + rate_and_relate_channels
         for channel in channels:
             try:
                 db.session.add(channel)
