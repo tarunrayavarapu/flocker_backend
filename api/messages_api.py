@@ -38,18 +38,9 @@ class MessagesAPI:
             try:
                 with open(MESSAGE_FILE_PATH, 'a') as file:
                     file.write(f"{message}\n")
-                return jsonify({'message': 'Message added successfully'}), 201
+                return {'message': 'Message added successfully'}, 201
             except Exception as e:
                 return {'message': f'Failed to add message: {str(e)}'}, 500
-
-        def delete(self):
-            """Clear all messages from the messages file."""
-            try:
-                with open(MESSAGE_FILE_PATH, 'w') as file:
-                    file.write("")  # Clear the file
-                return jsonify({'message': 'All messages deleted successfully'}), 200
-            except Exception as e:
-                return {'message': f'Failed to delete messages: {str(e)}'}, 500
 
     # Add the resource for /messages
     api.add_resource(_Messages, '/messages')
