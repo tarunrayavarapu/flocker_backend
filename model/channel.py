@@ -185,7 +185,7 @@ def initChannels():
         #P3 Channels Below
          # Share and Care channels below:
         DNHSCafe = Group.query.filter_by(_name='Study Room').first()
-        chess_forum = Group.query.filter_by(_name='Chess Forum').first()
+        Chess_Forum = Group.query.filter_by(_name='Chess Forum').first()
         share_and_care_channels = [
             Channel(name='Math 📓📈', group_id=limitless_connection.id),
             Channel(name='Chemistry 👩🏻‍🔬🧪', group_id=limitless_connection.id),
