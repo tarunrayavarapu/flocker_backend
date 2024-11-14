@@ -191,7 +191,7 @@ def initChannels():
             Channel(name='Biology 🧬🔬', group_id=limitless_connection.id),
             Channel(name='English 🍎📝', group_id=limitless_connection.id),
             Channel(name='Coding 💻👾', group_id=limitless_connection.id),
-            Channel(name='History 📚🏛️', group_id=limitless_connection.id),   
+            Channel(name='History 📚🏛️', group_id=limitless_connection.id), 
         ]
 
         # P2 channels below:
@@ -222,6 +222,7 @@ def initChannels():
             Channel(name='Food and Drink', group_id=dnero_store.id),
             Channel(name='Spirit', group_id=dnero_store.id),
             Channel(name='Limited Edition', group_id=dnero_store.id),
+            Channel(name='ZAFY', group_id=nfl_goats.id),
             Channel(name='Gift Cards', group_id=dnero_store.id),
         ]
         
