@@ -179,19 +179,23 @@ def initChannels():
             Channel(name='Memes', group_id=satire.id),
             Channel(name='Irony', group_id=satire.id),
             Channel(name='Cyber Patriots', group_id=activity_hub.id),
-            Channel(name='Robotics', group_id=activity_hub.id)
+            Channel(name='Robotics', group_id=activity_hub.id),
         ]
         
         #P3 Channels Below
          # Share and Care channels below:
         DNHSCafe = Group.query.filter_by(_name='Study Room').first()
+        Underground_Music = Group.query.filter_by(_name='Underground Music').first()
         share_and_care_channels = [
             Channel(name='Math 📓📈', group_id=limitless_connection.id),
             Channel(name='Chemistry 👩🏻‍🔬🧪', group_id=limitless_connection.id),
             Channel(name='Biology 🧬🔬', group_id=limitless_connection.id),
             Channel(name='English 🍎📝', group_id=limitless_connection.id),
             Channel(name='Coding 💻👾', group_id=limitless_connection.id),
-            Channel(name='History 📚🏛️', group_id=limitless_connection.id),   
+            Channel(name='History 📚🏛️', group_id=limitless_connection.id),
+            Channel(name='Artists', group_id=Underground_Music.id),
+            Channel(name='Songs', group_id=Underground_Music.id),
+            Channel(name='Genres', group_id=Underground_Music.id),
         ]
 
         # P2 channels below:
