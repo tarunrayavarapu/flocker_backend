@@ -197,6 +197,9 @@ def initChannels():
             Channel(name='General', group_id=chess_forum.id),
             Channel(name='Chess Tips', group_id=chess_forum.id),
             Channel(name='Game Updates', group_id=chess_forum.id),
+            Channel(name='Artists', group_id=Underground_Music.id),
+            Channel(name='Songs', group_id=Underground_Music.id),
+            Channel(name='Genres', group_id=Underground_Music.id),
         ]
 
         # P2 channels below:
