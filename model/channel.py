@@ -230,6 +230,11 @@ def initChannels():
             Channel(name='Food and Drink', group_id=dnero_store.id),
             Channel(name='Spirit', group_id=dnero_store.id),
             Channel(name='Limited Edition', group_id=dnero_store.id),
+            Channel(name='Quarterbacks', group_id=nfl_goats.id),
+            Channel(name='Running Backs', group_id=nfl_goats.id),
+            Channel(name='Wide Receivers', group_id=nfl_goats.id),
+            Channel(name='Defensive Players', group_id=nfl_goats.id),
+            Channel(name='NFL Divisions', group_id=nfl_goats.id),
             Channel(name='Gift Cards', group_id=dnero_store.id),
         ]
         
