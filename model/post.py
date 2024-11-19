@@ -96,7 +96,7 @@ class Post(db.Model):
         return data
     
 
-    def update(self, inputs):
+    def update(self):
         """
         Updates the post object with new data.
         
@@ -106,14 +106,14 @@ class Post(db.Model):
         Returns:
             Post: The updated post object, or None on error.
         """
-        if not isinstance(inputs, dict):
-            return self
-
-        title = inputs.get("title", "")
-        content = inputs.get("content", "")
-        channel_id = inputs.get("channel_id", None)
-        user_name = inputs.get("user_name", None)
-        channel_name = inputs.get("channel_name", None)
+        
+        inputs = Post.query.get(self.id)
+        
+        title = inputs._title
+        content = inputs._content
+        channel_id = inputs._channel_id
+        user_name = User.query.get(inputs._user_id).name if inputs._user_id else None
+        channel_name = Channel.query.get(inputs._channel_id).name if inputs._channel_id else None
 
         # If channel_name is provided, look up the corresponding channel_id
         if channel_name:
